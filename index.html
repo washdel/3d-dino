@@ -719,264 +719,210 @@
         </main>
     </div>
 
-
+    <!-- Tambahkan Chart.js untuk visualisasi data -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <script>
-        // Format currency to Indonesian Rupiah format
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('id-ID').format(Math.round(value));
-        }
+        // Data aplikasi
+        const appData = {
+            settings: {
+                filamentCost: 250000, // Harga filamen per kg (Rp)
+                electricityCost: 1500, // Biaya listrik per kWh (Rp)
+                printerWattage: 350, // Daya printer dalam watt
+                silicaCost: 500, // Biaya silica gel per print (Rp)
+                otherCosts: 1000, // Biaya lain per print (Rp)
+                profitMargin: 30 // Target margin keuntungan (%)
+            },
+            products: [],
+            transactions: []
+        };
 
-        // Format date for display (e.g., "29 Apr 2025")
-        function formatDate(date) {
-            const options = { day: 'numeric', month: 'short', year: 'numeric' };
-            return date.toLocaleDateString('id-ID', options);
-        }
+        // Inisialisasi aplikasi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load data dari localStorage jika ada
+            loadData();
+            
+            // Set tanggal hari ini
+            const today = new Date();
+            document.getElementById('current-date').textContent = formatDate(today);
+            document.getElementById('transaction-date').valueAsDate = today;
+            
+            // Set default tanggal untuk laporan mingguan
+            const startOfWeek = getStartOfWeek(today);
+            const endOfWeek = getEndOfWeek(today);
+            document.getElementById('weekly-start-date').valueAsDate = startOfWeek;
+            document.getElementById('weekly-end-date').valueAsDate = endOfWeek;
+            
+            // Set default bulan dan tahun untuk laporan bulanan
+            document.getElementById('month-select').value = today.getMonth();
+            document.getElementById('year-select').value = today.getFullYear();
+            
+            // Setup tab navigation
+            setupTabs();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Update tampilan
+            updateDailyView();
+            updateProductsTable();
+            updateSettingsForm();
+            
+            // Generate laporan mingguan dan bulanan default
+            generateWeeklyReport();
+            generateMonthlyReport();
+        });
 
-        // Format date for input value (YYYY-MM-DD)
-        function formatDateValue(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        // Get ISO week number from date
-        function getWeekNumber(date) {
-            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-            const dayNum = d.getUTCDay() || 7;
-            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-        }
-
-        // Delete a product
-        function deleteProduct(id) {
-            if (confirm('Anda yakin ingin menghapus produk ini?')) {
-                // Find index of product
-                const index = products.findIndex(p => p.id === id);
-                if (index !== -1) {
-                    // Remove product
-                    products.splice(index, 1);
-                    // Save data
-                    saveData();
-                    // Update UI
-                    updateProductsTable();
-                    updateProductSelect();
-                    alert('Produk berhasil dihapus!');
-                }
-            }
-        }
-
-        // Delete a transaction
-        function deleteTransaction(id) {
-            if (confirm('Anda yakin ingin menghapus transaksi ini?')) {
-                // Find index of transaction
-                const index = transactions.findIndex(t => t.id === id);
-                if (index !== -1) {
-                    // Remove transaction
-                    transactions.splice(index, 1);
-                    // Save data
-                    saveData();
-                    // Update UI
-                    updateDailyTransactionsTable();
-                    updateSummaries();
-                    alert('Transaksi berhasil dihapus!');
-                }
-            }
-        }
-
-        // Save data to localStorage
-        function saveData() {
-            localStorage.setItem('3dprint_settings', JSON.stringify(settings));
-            localStorage.setItem('3dprint_products', JSON.stringify(products));
-            localStorage.setItem('3dprint_transactions', JSON.stringify(transactions));
-        }
-
-        // Load data from localStorage
+        // Fungsi untuk memuat data dari localStorage
         function loadData() {
-            // Load settings
-            const savedSettings = localStorage.getItem('3dprint_settings');
-            if (savedSettings) {
-                settings = JSON.parse(savedSettings);
-            }
-            
-            // Load products
-            const savedProducts = localStorage.getItem('3dprint_products');
-            if (savedProducts) {
-                products = JSON.parse(savedProducts);
-            }
-            
-            // Load transactions
-            const savedTransactions = localStorage.getItem('3dprint_transactions');
-            if (savedTransactions) {
-                transactions = JSON.parse(savedTransactions);
+            const savedData = localStorage.getItem('3dPrintingFinanceApp');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                appData.settings = parsedData.settings || appData.settings;
+                appData.products = parsedData.products || appData.products;
+                appData.transactions = parsedData.transactions || appData.transactions;
             }
         }
 
-        // Export data to JSON file
-        function exportData() {
-            const data = {
-                settings: settings,
-                products: products,
-                transactions: transactions,
-                exportDate: new Date().toISOString()
-            };
-            
-            const dataStr = JSON.stringify(data, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
-            
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `3dprint_data_${formatDateValue(new Date())}.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        // Fungsi untuk menyimpan data ke localStorage
+        function saveData() {
+            localStorage.setItem('3dPrintingFinanceApp', JSON.stringify(appData));
         }
 
-        // Import data from JSON file
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        // Fungsi untuk mengatur tab navigation
+        function setupTabs() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
             
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Hapus kelas active dari semua tab dan tombol
+                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
                     
-                    // Validate data structure
-                    if (data.settings && data.products && data.transactions) {
-                        // Confirm import
-                        if (confirm('Data akan diimpor dan menggantikan data yang ada. Lanjutkan?')) {
-                            settings = data.settings;
-                            products = data.products;
-                            transactions = data.transactions;
-                            
-                            // Save to localStorage
-                            saveData();
-                            
-                            // Update UI
-                            updateProductsTable();
-                            updateProductSelect();
-                            updateDailyTransactionsTable();
-                            updateSummaries();
-                            loadSettingsToForm();
-                            
-                            alert('Data berhasil diimpor!');
-                        }
-                    } else {
-                        alert('Format file tidak valid!');
+                    // Tambahkan kelas active ke tab dan tombol yang dipilih
+                    const tabId = this.getAttribute('data-tab');
+                    this.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    // Update tampilan yang sesuai
+                    if (tabId === 'daily-tab') {
+                        updateDailyView();
+                    } else if (tabId === 'products-tab') {
+                        updateProductsTable();
+                    } else if (tabId === 'settings-tab') {
+                        updateSettingsForm();
+                    } else if (tabId === 'weekly-tab') {
+                        generateWeeklyReport();
+                    } else if (tabId === 'monthly-tab') {
+                        generateMonthlyReport();
                     }
-                } catch (error) {
-                    alert('Gagal memproses file! ' + error.message);
+                });
+            });
+        }
+
+        // Fungsi untuk mengatur event listeners
+        function setupEventListeners() {
+            // Form transaksi harian
+            document.getElementById('daily-form').addEventListener('submit', saveDailyTransaction);
+            
+            // Pilihan produk
+            document.getElementById('product-select').addEventListener('change', function() {
+                const customFields = document.getElementById('custom-product-fields');
+                if (this.value === 'custom') {
+                    customFields.style.display = 'block';
+                    document.getElementById('calculation-result').style.display = 'none';
+                } else {
+                    customFields.style.display = 'none';
+                    calculateProductCost(this.value);
                 }
-            };
-            reader.readAsText(file);
+            });
             
-            // Reset file input
-            event.target.value = '';
+            // Status pembayaran
+            document.getElementById('payment-status').addEventListener('change', function() {
+                const dpField = document.getElementById('dp-amount-field');
+                dpField.style.display = this.value === 'DP' ? 'block' : 'none';
+            });
+            
+            // Form produk
+            document.getElementById('product-form').addEventListener('submit', saveProduct);
+            
+            // Form pengaturan
+            document.getElementById('settings-form').addEventListener('submit', saveSettings);
+            
+            // Generate laporan mingguan
+            document.getElementById('generate-weekly-report').addEventListener('click', generateWeeklyReport);
+            
+            // Generate laporan bulanan
+            document.getElementById('generate-monthly-report').addEventListener('click', generateMonthlyReport);
+            
+            // Export data
+            document.getElementById('export-data').addEventListener('click', exportData);
+            
+            // Import data
+            document.getElementById('import-data').addEventListener('click', function() {
+                document.getElementById('import-file').click();
+            });
+            
+            document.getElementById('import-file').addEventListener('change', importData);
+            
+            // Reset data
+            document.getElementById('reset-transactions').addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin menghapus semua data transaksi?')) {
+                    appData.transactions = [];
+                    saveData();
+                    updateDailyView();
+                    alert('Semua data transaksi telah dihapus.');
+                }
+            });
+            
+            document.getElementById('reset-products').addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin menghapus semua data produk?')) {
+                    appData.products = [];
+                    saveData();
+                    updateProductsTable();
+                    alert('Semua data produk telah dihapus.');
+                }
+            });
+            
+            document.getElementById('reset-all').addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin menghapus SEMUA data (transaksi, produk, dan pengaturan)?')) {
+                    localStorage.removeItem('3dPrintingFinanceApp');
+                    location.reload();
+                }
+            });
         }
 
-        // Reset transactions
-        function resetTransactions() {
-            if (confirm('Anda yakin ingin menghapus semua data transaksi? Tindakan ini tidak dapat dibatalkan!')) {
-                transactions = [];
-                saveData();
-                updateDailyTransactionsTable();
-                updateSummaries();
-                alert('Data transaksi berhasil dihapus!');
+        // Fungsi untuk menyimpan transaksi harian
+        function saveDailyTransaction(e) {
+            e.preventDefault();
+            
+            const date = document.getElementById('transaction-date').value;
+            const customerName = document.getElementById('customer-name').value;
+            const productId = document.getElementById('product-select').value;
+            const quantity = parseInt(document.getElementById('product-quantity').value);
+            const paymentStatus = document.getElementById('payment-status').value;
+            const dpAmount = paymentStatus === 'DP' ? parseInt(document.getElementById('dp-amount').value) : 0;
+            
+            let productName, weight, printTime, price;
+            
+            if (productId === 'custom') {
+                productName = document.getElementById('custom-product-name').value;
+                weight = parseInt(document.getElementById('custom-product-weight').value);
+                printTime = parseFloat(document.getElementById('custom-product-time').value);
+                price = parseInt(document.getElementById('custom-product-price').value);
+            } else {
+                const product = appData.products.find(p => p.id === productId);
+                if (!product) {
+                    alert('Produk tidak ditemukan');
+                    return;
+                }
+                productName = product.name;
+                weight = product.weight;
+                printTime = product.printTime;
+                price = product.price;
             }
-        }
-
-        // Reset products
-        function resetProducts() {
-            if (confirm('Anda yakin ingin menghapus semua data produk? Tindakan ini tidak dapat dibatalkan!')) {
-                products = [];
-                saveData();
-                updateProductsTable();
-                updateProductSelect();
-                alert('Data produk berhasil dihapus!');
-            }
-        }
-
-        // Reset all data
-        function resetAllData() {
-            if (confirm('Anda yakin ingin menghapus SEMUA data aplikasi? Tindakan ini tidak dapat dibatalkan!')) {
-                settings = {
-                    filamentCost: 350000,
-                    electricityCost: 1500,
-                    printerWattage: 250,
-                    silicaCost: 2000,
-                    otherCosts: 5000,
-                    profitMargin: 50
-                };
-                products = [];
-                transactions = [];
-                
-                saveData();
-                
-                updateProductsTable();
-                updateProductSelect();
-                updateDailyTransactionsTable();
-                updateSummaries();
-                loadSettingsToForm();
-                
-                alert('Semua data berhasil direset ke pengaturan awal!');
-            }
-        }
-
-        // Load settings values to form
-        function loadSettingsToForm() {
-            document.getElementById('filament-cost').value = settings.filamentCost;
-            document.getElementById('electricity-cost').value = settings.electricityCost;
-            document.getElementById('printer-wattage').value = settings.printerWattage;
-            document.getElementById('silica-cost').value = settings.silicaCost;
-            document.getElementById('other-costs').value = settings.otherCosts;
-            document.getElementById('profit-margin').value = settings.profitMargin;
-        }
-
-        // Complete the updateSummaries function that was cut off
-        function updateSummaries() {
-            // Daily summary
-            const today = formatDateValue(new Date());
-            const todayTransactions = transactions.filter(tx => tx.date === today);
             
-            const dailyTotal = todayTransactions.length;
-            const dailyIncome = todayTransactions.reduce((sum, tx) => sum + tx.totalPrice, 0);
-            const dailyCosts = todayTransactions.reduce((sum, tx) => sum + tx.totalCost, 0);
-            const dailyProfit = todayTransactions.reduce((sum, tx) => sum + tx.profitMargin, 0);
-            const dailyFilament = todayTransactions.reduce((sum, tx) => sum + tx.totalWeight, 0);
-            const dailyTime = todayTransactions.reduce((sum, tx) => sum + tx.totalTime, 0);
-            
-            document.getElementById('summary-daily-transactions').textContent = dailyTotal;
-            document.getElementById('summary-daily-income').textContent = 'Rp ' + formatCurrency(dailyIncome);
-            document.getElementById('summary-daily-costs').textContent = 'Rp ' + formatCurrency(dailyCosts);
-            document.getElementById('summary-daily-profit').textContent = 'Rp ' + formatCurrency(dailyProfit);
-            document.getElementById('summary-daily-filament').textContent = dailyFilament.toFixed(0) + ' gram';
-            document.getElementById('summary-daily-print-time').textContent = dailyTime.toFixed(1) + ' jam';
-            
-            // Total summary (all time)
-            const totalTransactions = transactions.length;
-            const totalIncome = transactions.reduce((sum, tx) => sum + tx.totalPrice, 0);
-            const totalCosts = transactions.reduce((sum, tx) => sum + tx.totalCost, 0);
-            const totalProfit = transactions.reduce((sum, tx) => sum + tx.profitMargin, 0);
-            const totalFilament = transactions.reduce((sum, tx) => sum + tx.totalWeight, 0);
-            const totalTime = transactions.reduce((sum, tx) => sum + tx.totalTime, 0);
-            
-            document.getElementById('summary-total-transactions').textContent = totalTransactions;
-            document.getElementById('summary-total-income').textContent = 'Rp ' + formatCurrency(totalIncome);
-            document.getElementById('summary-total-costs').textContent = 'Rp ' + formatCurrency(totalCosts);
-            document.getElementById('summary-total-profit').textContent = 'Rp ' + formatCurrency(totalProfit);
-            document.getElementById('summary-total-filament').textContent = totalFilament.toFixed(0) + ' gram';
-            document.getElementById('summary-total-print-time').textContent = totalTime.toFixed(1) + ' jam';
-            
-            // Calculate pending payments
-            const pendingTransactions = transactions.filter(tx => tx.paymentStatus === 'DP');
-            const pendingAmount = pendingTransactions.reduce(
-                (sum, tx) => sum + (tx.totalPrice - tx.dpAmount), 0
-            );
-            document.getElementById('summary-pending-payments').textContent = 'Rp ' + formatCurrency(pendingAmount);
-        }
-    </script>
-</body>
-</html>
+            // Hitung biaya produksi
+            const filamentCost = (weight / 1000) * appData.settings.filamentCost;
+            const electricityCost = (appData.settings.printerWattage * printTime / 1000) * appData.settings.electricityCost;
+            const totalCost = filamentCost +
