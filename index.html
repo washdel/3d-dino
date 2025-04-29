@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Pencatatan Keuangan 3D Printing - Bambu Lab X1 Carbon</title>
+    <title>3D Printing Business Tracker - Bambu Lab X1 Carbon</title>
     <style>
         :root {
-            --primary-color: #4e73df;
-            --secondary-color: #1cc88a;
-            --danger-color: #e74a3b;
-            --warning-color: #f6c23e;
-            --dark-color: #3a3b45;
-            --light-color: #f8f9fc;
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --dark: #34495e;
+            --light: #ecf0f1;
+            --warning: #e74c3c;
+            --info: #f39c12;
         }
         
         * {
@@ -22,77 +22,65 @@
         }
         
         body {
-            background-color: #f8f9fc;
+            background-color: #f5f7fa;
             color: #333;
             line-height: 1.6;
         }
         
         .container {
+            width: 95%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 15px;
+            padding: 20px;
         }
         
         header {
-            background-color: var(--primary-color);
+            background-color: var(--primary);
             color: white;
-            padding: 1rem 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        header h1 {
-            font-size: 1.8rem;
+            padding: 1rem;
             text-align: center;
-        }
-        
-        .subtitle {
-            font-size: 1rem;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.8);
-            margin-top: 0.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         nav {
-            background-color: white;
-            padding: 1rem 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            background-color: var(--dark);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 2rem;
         }
         
         .tabs {
             display: flex;
-            justify-content: center;
-            gap: 1rem;
+            list-style: none;
         }
         
-        .tab-btn {
-            background-color: var(--light-color);
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
+        .tabs li {
+            flex: 1;
         }
         
-        .tab-btn:hover {
-            background-color: #e8e8e8;
-        }
-        
-        .tab-btn.active {
-            background-color: var(--primary-color);
+        .tabs a {
+            display: block;
             color: white;
+            text-decoration: none;
+            text-align: center;
+            padding: 15px 0;
+            font-weight: bold;
+            transition: all 0.3s;
         }
         
-        .content {
-            margin-top: 2rem;
-            background-color: white;
-            border-radius: 6px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 2rem;
+        .tabs a:hover, .tabs a.active {
+            background-color: var(--primary);
         }
         
         .tab-content {
             display: none;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
         }
         
         .tab-content.active {
@@ -106,1567 +94,1369 @@
         label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: 600;
+            font-weight: bold;
+            color: var(--dark);
         }
         
-        input, select {
+        input, select, textarea {
             width: 100%;
-            padding: 0.75rem;
+            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 1rem;
         }
         
-        .form-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .form-row > div {
-            flex: 1;
-        }
-        
-        .btn {
-            padding: 0.75rem 1.5rem;
+        button {
+            background-color: var(--secondary);
+            color: white;
             border: none;
+            padding: 12px 20px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            font-weight: bold;
+            transition: all 0.3s;
         }
         
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #375ad3;
-        }
-        
-        .btn-danger {
-            background-color: var(--danger-color);
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background-color: #d32a1a;
+        button:hover {
+            background-color: #27ae60;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
+            background: white;
         }
         
         th, td {
-            padding: 0.75rem;
+            padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
         
         th {
-            background-color: #f6f9ff;
-            font-weight: 600;
+            background-color: var(--primary);
+            color: white;
         }
         
-        tr:hover {
-            background-color: #f8f9fc;
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
         
-        .summary {
-            margin-top: 2rem;
-            background-color: #f6f9ff;
+        .summary-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .summary-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 0.5rem;
+        }
+        
+        .summary-data {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .data-item {
+            flex: 1;
+            min-width: 200px;
+            background: var(--light);
             padding: 1rem;
             border-radius: 4px;
-            border-left: 4px solid var(--primary-color);
+            text-align: center;
         }
         
-        .summary h3 {
-            margin-bottom: 1rem;
-            color: var(--primary-color);
+        .data-item .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 0.5rem 0;
         }
         
-        .summary-item {
+        .data-item .label {
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .product-image {
+            height: 150px;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            font-weight: bold;
+        }
+        
+        .product-details {
+            padding: 1rem;
+        }
+        
+        .product-details h4 {
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .product-stats {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            color: #666;
         }
         
-        .info-box {
-            background-color: #f6f9ff;
-            padding: 1rem;
+        .product-price {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+        }
+        
+        .quick-add {
+            background: var(--secondary);
+            color: white;
+            display: block;
+            text-align: center;
+            padding: 0.7rem;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        
+        .quick-add:hover {
+            background: #27ae60;
+        }
+        
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .data-item {
+                min-width: 100%;
+            }
+            
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+
+        .delete-product, .delete-filament {
+            background-color: var(--warning);
+            color: white;
+            border: none;
+            padding: 8px 12px;
             border-radius: 4px;
-            margin-bottom: 1rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            width: 100%;
+            transition: all 0.3s;
         }
-        
-        .info-box p {
-            margin-bottom: 0.5rem;
+
+        .delete-product:hover, .delete-filament:hover {
+            background-color: #c0392b;
         }
-        
-        .btn-small {
-            padding: 0.25rem 0.5rem;
+
+        .product-details button {
+            margin-top: 8px;
+        }
+
+        #filament-inventory button {
+            margin-right: 5px;
+            padding: 5px 10px;
             font-size: 0.8rem;
         }
-        
-        .report-options {
-            margin-bottom: 1rem;
+
+        .update-inventory {
+            background-color: var(--info);
         }
-        
-        .products-library {
-            margin-top: 2rem;
-        }
-        
-        .product-item {
-            background-color: white;
-            padding: 1rem;
-            border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 1rem;
-        }
-        
-        .chart-container {
-            margin-top: 2rem;
-            height: 300px;
+
+        .update-inventory:hover {
+            background-color: #d35400;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Sistem Pencatatan Keuangan 3D Printing</h1>
-            <p class="subtitle">Bambu Lab X1 Carbon</p>
+    <div class="container">
+        <header>
+            <h1>3D Printing Business Tracker</h1>
+            <p>Bambu Lab X1 Carbon</p>
+        </header>
+        
+        <nav>
+            <ul class="tabs">
+                <li><a href="#" class="tab-link active" data-tab="daily">Pencatatan Harian</a></li>
+                <li><a href="#" class="tab-link" data-tab="weekly">Laporan Mingguan</a></li>
+                <li><a href="#" class="tab-link" data-tab="monthly">Laporan Bulanan</a></li>
+                <li><a href="#" class="tab-link" data-tab="products">Produk & Kalkulasi</a></li>
+                <li><a href="#" class="tab-link" data-tab="inventory">Inventaris</a></li>
+            </ul>
+        </nav>
+        
+        <!-- Daily Recording Tab -->
+        <div id="daily" class="tab-content active">
+            <h2>Pencatatan Harian</h2>
+            
+            <div class="form-group">
+                <label for="date">Tanggal:</label>
+                <input type="date" id="date" value="">
+            </div>
+            
+            <div class="form-group">
+                <label for="product-select">Pilih Produk:</label>
+                <select id="product-select">
+                    <option value="">-- Pilih Produk --</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="filament-type">Jenis Filamen:</label>
+                <select id="filament-type">
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="filament-usage">Penggunaan Filamen (gram):</label>
+                <input type="number" id="filament-usage" min="0" step="0.1">
+            </div>
+            
+            <div class="form-group">
+                <label for="print-time">Waktu Cetak (jam):</label>
+                <input type="number" id="print-time" min="0" step="0.1">
+            </div>
+            
+            <div class="form-group" id="calculation-results">
+                <div class="summary-card">
+                    <h3>Hasil Kalkulasi Otomatis</h3>
+                    <div class="summary-data">
+                        <div class="data-item">
+                            <div class="label">Biaya Filamen</div>
+                            <div class="value" id="filament-cost">Rp0</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="label">Biaya Listrik</div>
+                            <div class="value" id="electricity-cost">Rp0</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="label">Total Biaya</div>
+                            <div class="value" id="total-cost">Rp0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="customer-name">Nama Pelanggan:</label>
+                <input type="text" id="customer-name">
+            </div>
+            
+            <div class="form-group">
+                <label for="selling-price">Harga Jual:</label>
+                <input type="number" id="selling-price" min="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="notes">Catatan:</label>
+                <textarea id="notes" rows="3"></textarea>
+            </div>
+            
+            <button id="save-daily" type="button">Simpan Catatan</button>
+            
+            <h3 style="margin-top: 2rem;">Catatan Hari Ini</h3>
+            <table id="daily-records">
+                <thead>
+                    <tr>
+                        <th>Produk</th>
+                        <th>Filamen</th>
+                        <th>Berat (g)</th>
+                        <th>Waktu (jam)</th>
+                        <th>Biaya</th>
+                        <th>Harga Jual</th>
+                        <th>Profit</th>
+                        <th>Pelanggan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
         </div>
-    </header>
-    
-    <nav>
-        <div class="container">
-            <div class="tabs">
-                <button class="tab-btn active" data-tab="daily-tab">Pencatatan Harian</button>
-                <button class="tab-btn" data-tab="weekly-tab">Laporan Mingguan</button>
-                <button class="tab-btn" data-tab="monthly-tab">Laporan Bulanan</button>
-                <button class="tab-btn" data-tab="products-tab">Daftar Produk</button>
-                <button class="tab-btn" data-tab="settings-tab">Pengaturan</button>
+        
+        <!-- Weekly Report Tab -->
+        <div id="weekly" class="tab-content">
+            <h2>Laporan Mingguan</h2>
+            
+            <div class="form-group">
+                <label for="week-select">Pilih Minggu:</label>
+                <select id="week-select">
+                    <option value="week-1">Minggu 1</option>
+                    <option value="week-2">Minggu 2</option>
+                    <option value="week-3">Minggu 3</option>
+                    <option value="week-4">Minggu 4</option>
+                </select>
+            </div>
+            
+            <div class="summary-card">
+                <h3>Ringkasan Mingguan</h3>
+                <div class="summary-data">
+                    <div class="data-item">
+                        <div class="label">Total Produk</div>
+                        <div class="value" id="weekly-products">0</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Penggunaan Filamen</div>
+                        <div class="value" id="weekly-filament">0g</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Total Waktu Cetak</div>
+                        <div class="value" id="weekly-time">0 jam</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Total Pendapatan</div>
+                        <div class="value" id="weekly-revenue">Rp0</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Total Biaya</div>
+                        <div class="value" id="weekly-cost">Rp0</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Profit</div>
+                        <div class="value" id="weekly-profit">Rp0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Detail Penjualan Mingguan</h3>
+            <table id="weekly-records">
+                <thead>
+                    <tr>
+                        <th>Hari</th>
+                        <th>Produk</th>
+                        <th>Filamen</th>
+                        <th>Berat (g)</th>
+                        <th>Waktu (jam)</th>
+                        <th>Biaya</th>
+                        <th>Harga Jual</th>
+                        <th>Profit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+            
+            <div class="summary-card">
+                <h3>Produk Terpopuler</h3>
+                <div id="popular-products-chart" style="height: 300px; background: #eee; display: flex; align-items: center; justify-content: center;">
+                    Chart akan ditampilkan di sini
+                </div>
             </div>
         </div>
-    </nav>
-    
-    <div class="container">
-        <main class="content">
-            <!-- Tab Pencatatan Harian -->
-            <div class="tab-content active" id="daily-tab">
-                <h2>Pencatatan Transaksi Harian</h2>
-                <div class="info-box">
-                    <p>Tanggal: <span id="current-date"></span></p>
-                    <p>Total Transaksi Hari Ini: <span id="total-daily-transactions">0</span></p>
-                    <p>Total Pendapatan Hari Ini: <span id="total-daily-income">Rp 0</span></p>
+        
+        <!-- Monthly Report Tab -->
+        <div id="monthly" class="tab-content">
+            <h2>Laporan Bulanan</h2>
+            
+            <div class="form-group">
+                <label for="month-select">Pilih Bulan:</label>
+                <select id="month-select">
+                    <option value="1">Januari</option>
+                    <option value="2">Februari</option>
+                    <option value="3">Maret</option>
+                    <option value="4">April</option>
+                    <option value="5">Mei</option>
+                    <option value="6">Juni</option>
+                    <option value="7">Juli</option>
+                    <option value="8">Agustus</option>
+                    <option value="9">September</option>
+                    <option value="10">Oktober</option>
+                    <option value="11">November</option>
+                    <option value="12">Desember</option>
+                </select>
+            </div>
+            
+            <div class="summary-card">
+                <h3>Ringkasan Bulanan</h3>
+                <div class="summary-data">
+                    <div class="data-item">
+                        <div class="label">Total Produk</div>
+                        <div class="value" id="monthly-products">0</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Penggunaan Filamen</div>
+                        <div class="value" id="monthly-filament">0g</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Total Waktu Cetak</div>
+                        <div class="value" id="monthly-time">0 jam</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Total Pendapatan</div>
+                        <div class="value" id="monthly-revenue">Rp0</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Total Biaya</div>
+                        <div class="value" id="monthly-cost">Rp0</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="label">Profit</div>
+                        <div class="value" id="monthly-profit">Rp0</div>
+                    </div>
                 </div>
-                
-                <form id="daily-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="transaction-date">Tanggal</label>
-                            <input type="date" id="transaction-date" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="customer-name">Nama Pelanggan</label>
-                            <input type="text" id="customer-name" placeholder="Nama Pelanggan" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="product-select">Produk</label>
-                            <select id="product-select" required>
-                                <option value="">-- Pilih Produk --</option>
-                                <option value="custom">Produk Kustom</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="product-quantity">Jumlah</label>
-                            <input type="number" id="product-quantity" min="1" value="1" required>
-                        </div>
-                    </div>
-                    
-                    <div id="custom-product-fields" style="display: none;">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="custom-product-name">Nama Produk Kustom</label>
-                                <input type="text" id="custom-product-name" placeholder="Nama Produk">
-                            </div>
-                            <div class="form-group">
-                                <label for="custom-product-weight">Berat Filamen (gram)</label>
-                                <input type="number" id="custom-product-weight" min="1" placeholder="Berat dalam gram">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="custom-product-time">Waktu Cetak (jam)</label>
-                                <input type="number" id="custom-product-time" min="0.1" step="0.1" placeholder="Waktu cetak dalam jam">
-                            </div>
-                            <div class="form-group">
-                                <label for="custom-product-price">Harga (Rp)</label>
-                                <input type="number" id="custom-product-price" min="1000" step="1000" placeholder="Harga dalam Rupiah">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="payment-status">Status Pembayaran</label>
-                            <select id="payment-status" required>
-                                <option value="Lunas">Lunas</option>
-                                <option value="DP">DP (Uang Muka)</option>
-                                <option value="Belum">Belum Bayar</option>
-                            </select>
-                        </div>
-                        <div class="form-group" id="dp-amount-field" style="display: none;">
-                            <label for="dp-amount">Jumlah DP (Rp)</label>
-                            <input type="number" id="dp-amount" min="1000" step="1000" placeholder="Jumlah DP dalam Rupiah">
-                        </div>
-                    </div>
-                    
-                    <div class="info-box" id="calculation-result" style="display: none;">
-                        <h3>Informasi Kalkulasi</h3>
-                        <p>Berat Filamen: <span id="calc-filament-weight">0</span> gram</p>
-                        <p>Waktu Cetak: <span id="calc-print-time">0</span> jam</p>
-                        <p>Biaya Filamen: Rp <span id="calc-filament-cost">0</span></p>
-                        <p>Biaya Listrik: Rp <span id="calc-electricity-cost">0</span></p>
-                        <p>Total Biaya Produksi: Rp <span id="calc-total-cost">0</span></p>
-                        <p>Harga Jual: Rp <span id="calc-selling-price">0</span></p>
-                        <p>Margin Keuntungan: Rp <span id="calc-profit-margin">0</span> (<span id="calc-profit-percentage">0</span>%)</p>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">Simpan Transaksi</button>
-                </form>
-                
-                <h3 style="margin-top: 2rem;">Daftar Transaksi Hari Ini</h3>
-                <table id="daily-transactions">
+            </div>
+            
+            <div class="summary-card">
+                <h3>Tren Mingguan dalam Bulan</h3>
+                <div id="weekly-trend-chart" style="height: 300px; background: #eee; display: flex; align-items: center; justify-content: center;">
+                    Chart akan ditampilkan di sini
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>Distribusi Penggunaan Filamen</h3>
+                <div id="filament-distribution-chart" style="height: 300px; background: #eee; display: flex; align-items: center; justify-content: center;">
+                    Chart akan ditampilkan di sini
+                </div>
+            </div>
+            
+            <h3>Detail Penjualan Bulanan</h3>
+            <table id="monthly-records">
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Produk</th>
+                        <th>Filamen</th>
+                        <th>Berat (g)</th>
+                        <th>Waktu (jam)</th>
+                        <th>Biaya</th>
+                        <th>Harga Jual</th>
+                        <th>Profit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Products & Calculations Tab -->
+        <div id="products" class="tab-content">
+            <h2>Produk & Kalkulasi Otomatis</h2>
+            
+            <div class="form-group">
+                <label for="electricity-rate">Harga Listrik per kWh (Rp):</label>
+                <input type="number" id="electricity-rate" value="1444.70">
+                <p><small>Default: Rp1.444,70 (tarif dasar listrik rumah tangga R1/900VA)</small></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="printer-power">Daya Printer saat Cetak (Watt):</label>
+                <input type="number" id="printer-power" value="200">
+                <p><small>Default: 200W untuk Bambu Lab X1 Carbon</small></p>
+            </div>
+            
+            <h3>Daftar Produk Preset</h3>
+            <p>Klik produk untuk melihat detail dan menambahkannya ke catatan harian</p>
+            
+            <h3 style="margin-top: 2rem;">Daftar Produk Preset</h3>
+            <p>Klik produk untuk melihat detail dan menambahkannya ke catatan harian</p>
+
+            <div class="product-grid" id="product-list">
+                <!-- Products will be populated here -->
+            </div>
+            
+            <h3 style="margin-top: 2rem;">Tambah/Edit Produk Preset</h3>
+            <div class="form-group">
+                <label for="new-product-name">Nama Produk:</label>
+                <input type="text" id="new-product-name">
+            </div>
+            
+            <div class="form-group">
+                <label for="new-product-filament">Penggunaan Filamen (gram):</label>
+                <input type="number" id="new-product-filament" min="0" step="0.1">
+            </div>
+            
+            <div class="form-group">
+                <label for="new-product-time">Waktu Cetak (jam):</label>
+                <input type="number" id="new-product-time" min="0" step="0.1">
+            </div>
+            
+            <div class="form-group">
+                <label for="new-product-price">Harga Jual (Rp):</label>
+                <input type="number" id="new-product-price" min="0">
+            </div>
+            
+            <button id="save-product" type="button">Simpan Produk</button>
+        </div>
+        
+        <!-- Inventory Tab -->
+        <div id="inventory" class="tab-content">
+            <h2>Inventaris Bahan</h2>
+            
+            <div class="summary-card">
+                <h3>Filamen</h3>
+                <table id="filament-inventory">
                     <thead>
                         <tr>
-                            <th>Tanggal</th>
-                            <th>Pelanggan</th>
-                            <th>Produk</th>
-                            <th>Jumlah</th>
-                            <th>Berat (g)</th>
-                            <th>Waktu (jam)</th>
-                            <th>Harga (Rp)</th>
+                            <th>Jenis & Warna</th>
+                            <th>Stok Awal (g)</th>
+                            <th>Terpakai (g)</th>
+                            <th>Sisa (g)</th>
+                            <th>Harga per kg</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="filament-list">
+                        <!-- Filaments will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="form-group">
+                <label for="add-filament-type">Tambah Jenis Filamen Baru:</label>
+                <input type="text" id="add-filament-type" placeholder="Jenis & Warna">
+            </div>
+            
+            <div class="form-group">
+                <label for="add-filament-amount">Jumlah (gram):</label>
+                <input type="number" id="add-filament-amount" min="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="add-filament-price">Harga per kg (Rp):</label>
+                <input type="number" id="add-filament-price" min="0">
+            </div>
+            
+            <button id="add-filament" type="button">Tambah Filamen</button>
+            
+            <div class="summary-card" style="margin-top: 2rem;">
+                <h3>Silica Gel</h3>
+                <table id="silica-inventory">
+                    <thead>
+                        <tr>
+                            <th>Lokasi</th>
+                            <th>Tanggal Pakai</th>
+                            <th>Tanggal Recharge</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Data akan diisi melalui JavaScript -->
-                    </tbody>
-                </table>
-                
-                <div class="summary">
-                    <h3>Ringkasan Harian</h3>
-                    <div class="summary-item">
-                        <span>Total Transaksi:</span>
-                        <span id="summary-daily-transactions">0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Pendapatan:</span>
-                        <span id="summary-daily-income">Rp 0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Biaya Produksi:</span>
-                        <span id="summary-daily-costs">Rp 0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Keuntungan:</span>
-                        <span id="summary-daily-profit">Rp 0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Filamen Terpakai:</span>
-                        <span id="summary-daily-filament">0 gram</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Waktu Cetak:</span>
-                        <span id="summary-daily-print-time">0 jam</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Tab Laporan Mingguan -->
-            <div class="tab-content" id="weekly-tab">
-                <h2>Laporan Mingguan</h2>
-                <div class="report-options">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="weekly-start-date">Tanggal Mulai</label>
-                            <input type="date" id="weekly-start-date">
-                        </div>
-                        <div class="form-group">
-                            <label for="weekly-end-date">Tanggal Akhir</label>
-                            <input type="date" id="weekly-end-date">
-                        </div>
-                        <div class="form-group" style="display: flex; align-items: flex-end;">
-                            <button id="generate-weekly-report" class="btn btn-primary">Tampilkan Laporan</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="info-box">
-                    <p>Periode: <span id="weekly-period">-</span></p>
-                    <p>Total Transaksi: <span id="weekly-total-transactions">0</span></p>
-                    <p>Total Pendapatan: <span id="weekly-total-income">Rp 0</span></p>
-                </div>
-                
-                <h3>Transaksi Per Hari</h3>
-                <table id="weekly-summary-table">
-                    <thead>
                         <tr>
-                            <th>Tanggal</th>
-                            <th>Jumlah Transaksi</th>
-                            <th>Total Pendapatan</th>
-                            <th>Total Biaya</th>
-                            <th>Keuntungan</th>
-                            <th>Filamen (g)</th>
-                            <th>Waktu Cetak (jam)</th>
+                            <td>Storage Box 1</td>
+                            <td>29/04/2025</td>
+                            <td>-</td>
+                            <td>🔵 Aktif</td>
+                            <td><button class="update-silica">Update</button></td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Data akan diisi melalui JavaScript -->
-                    </tbody>
-                </table>
-                
-                <div class="chart-container">
-                    <canvas id="weekly-chart"></canvas>
-                </div>
-                
-                <div class="summary">
-                    <h3>Ringkasan Mingguan</h3>
-                    <div class="summary-item">
-                        <span>Total Transaksi:</span>
-                        <span id="summary-weekly-transactions">0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Pendapatan:</span>
-                        <span id="summary-weekly-income">Rp 0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Biaya Produksi:</span>
-                        <span id="summary-weekly-costs">Rp 0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Keuntungan:</span>
-                        <span id="summary-weekly-profit">Rp 0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Filamen Terpakai:</span>
-                        <span id="summary-weekly-filament">0 gram</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Waktu Cetak:</span>
-                        <span id="summary-weekly-print-time">0 jam</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Rata-rata Transaksi per Hari:</span>
-                        <span id="summary-weekly-avg-transactions">0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Rata-rata Pendapatan per Hari:</span>
-                        <span id="summary-weekly-avg-income">Rp 0</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Tab Laporan Bulanan -->
-            <div class="tab-content" id="monthly-tab">
-                <h2>Laporan Bulanan</h2>
-                <div class="report-options">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="month-select">Bulan</label>
-                            <select id="month-select">
-                                <option value="0">Januari</option>
-                                <option value="1">Februari</option>
-                                <option value="2">Maret</option>
-                                <option value="3">April</option>
-                                <option value="4">Mei</option>
-                                <option value="5">Juni</option>
-                                <option value="6">Juli</option>
-                                <option value="7">Agustus</option>
-                                <option value="8">September</option>
-                                <option value="9">Oktober</option>
-                                <option value="10">November</option>
-                                <option value="11">Desember</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="year-select">Tahun</label>
-                            <input type="number" id="year-select" min="2023" max="2050">
-                        </div>
-                        <div class="form-group" style="display: flex; align-items: flex-end;">
-                            <button id="generate-monthly-report" class="btn btn-primary">Tampilkan Laporan</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="info-box">
-                    <p>Periode: <span id="monthly-period">-</span></p>
-                    <p>Total Transaksi: <span id="monthly-total-transactions">0</span></p>
-                    <p>Total Pendapatan: <span id="monthly-total-income">Rp 0</span></p>
-                </div>
-                
-                <h3>Transaksi Per Minggu</h3>
-                <table id="monthly-summary-table">
-                    <thead>
                         <tr>
-                            <th>Minggu</th>
-                            <th>Jumlah Transaksi</th>
-                            <th>Total Pendapatan</th>
-                            <th>Total Biaya</th>
-                            <th>Keuntungan</th>
-                            <th>Filamen (g)</th>
-                            <th>Waktu Cetak (jam)</th>
+                            <td>Storage Box 2</td>
+                            <td>29/04/2025</td>
+                            <td>-</td>
+                            <td>🔵 Aktif</td>
+                            <td><button class="update-silica">Update</button></td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Data akan diisi melalui JavaScript -->
-                    </tbody>
-                </table>
-                
-                <div class="chart-container">
-                    <canvas id="monthly-chart"></canvas>
-                </div>
-                
-                <h3>Produk Terlaris</h3>
-                <table id="top-products-table">
-                    <thead>
                         <tr>
-                            <th>Produk</th>
-                            <th>Jumlah Terjual</th>
-                            <th>Total Pendapatan</th>
-                            <th>Total Filamen (g)</th>
-                            <th>Total Waktu (jam)</th>
+                            <td>Printer Enclosure</td>
+                            <td>29/04/2025</td>
+                            <td>-</td>
+                            <td>🔵 Aktif</td>
+                            <td><button class="update-silica">Update</button></td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Data akan diisi melalui JavaScript -->
-                    </tbody>
-                </table>
-                
-                <div class="summary">
-                    <h3>Ringkasan Bulanan</h3>
-                    <div class="summary-item">
-                        <span>Total Transaksi:</span>
-                        <span id="summary-monthly-transactions">0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Pendapatan:</span>
-                        <span id="summary-monthly-income">Rp 0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Biaya Produksi:</span>
-                        <span id="summary-monthly-costs">Rp 0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Keuntungan:</span>
-                        <span id="summary-monthly-profit">Rp 0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Filamen Terpakai:</span>
-                        <span id="summary-monthly-filament">0 gram</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Waktu Cetak:</span>
-                        <span id="summary-monthly-print-time">0 jam</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Rata-rata Transaksi per Hari:</span>
-                        <span id="summary-monthly-avg-transactions">0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Rata-rata Pendapatan per Hari:</span>
-                        <span id="summary-monthly-avg-income">Rp 0</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Tab Daftar Produk -->
-            <div class="tab-content" id="products-tab">
-                <h2>Daftar Produk</h2>
-                <p>Tambahkan daftar produk yang sering Anda cetak beserta informasi teknis untuk kalkulasi otomatis.</p>
-                
-                <form id="product-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="product-name">Nama Produk</label>
-                            <input type="text" id="product-name" placeholder="Nama Produk" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="product-weight">Berat Filamen (gram)</label>
-                            <input type="number" id="product-weight" min="1" placeholder="Berat dalam gram" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="product-time">Waktu Cetak (jam)</label>
-                            <input type="number" id="product-time" min="0.1" step="0.1" placeholder="Waktu cetak dalam jam" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="product-price">Harga (Rp)</label>
-                            <input type="number" id="product-price" min="1000" step="1000" placeholder="Harga dalam Rupiah" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="product-category">Kategori</label>
-                            <input type="text" id="product-category" placeholder="Kategori Produk">
-                        </div>
-                        <div class="form-group">
-                            <label for="product-description">Deskripsi (opsional)</label>
-                            <input type="text" id="product-description" placeholder="Deskripsi singkat produk">
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">Tambah Produk</button>
-                </form>
-                
-                <h3 style="margin-top: 2rem;">Daftar Produk Tersimpan</h3>
-                <table id="products-table">
-                    <thead>
                         <tr>
-                            <th>Nama Produk</th>
-                            <th>Kategori</th>
-                            <th>Berat (g)</th>
-                            <th>Waktu (jam)</th>
-                            <th>Harga (Rp)</th>
-                            <th>Biaya Produksi (Rp)</th>
-                            <th>Margin (%)</th>
-                            <th>Aksi</th>
+                            <td>Filament Box</td>
+                            <td>29/04/2025</td>
+                            <td>-</td>
+                            <td>🔵 Aktif</td>
+                            <td><button class="update-silica">Update</button></td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Data akan diisi melalui JavaScript -->
                     </tbody>
                 </table>
             </div>
             
-            <!-- Tab Pengaturan -->
-            <div class="tab-content" id="settings-tab">
-                <h2>Pengaturan</h2>
-                <p>Konfigurasi parameter biaya untuk kalkulasi yang akurat.</p>
-                
-                <form id="settings-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="filament-cost">Harga Filamen per kg (Rp)</label>
-                            <input type="number" id="filament-cost" min="1000" step="1000" placeholder="Harga per kg" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="electricity-cost">Biaya Listrik per kWh (Rp)</label>
-                            <input type="number" id="electricity-cost" min="100" step="100" placeholder="Biaya per kWh" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="printer-wattage">Daya Printer (Watt)</label>
-                            <input type="number" id="printer-wattage" min="1" placeholder="Daya dalam Watt" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="silica-cost">Biaya Silica Gel per print (Rp)</label>
-                            <input type="number" id="silica-cost" min="0" step="100" placeholder="Biaya per print" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="other-costs">Biaya Lain per print (Rp)</label>
-                            <input type="number" id="other-costs" min="0" step="100" placeholder="Biaya lain per print" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="profit-margin">Target Margin Keuntungan (%)</label>
-                            <input type="number" id="profit-margin" min="0" max="1000" placeholder="Target margin dalam %" required>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
-                </form>
-                
-                <div class="form-group" style="margin-top: 2rem;">
-                    <h3>Backup Data</h3>
-                    <div class="form-row">
-                        <div class="form-group" style="display: flex; align-items: flex-end;">
-                            <button id="export-data" class="btn btn-primary">Export Data (JSON)</button>
-                        </div>
-                        <div class="form-group" style="display: flex; align-items: flex-end;">
-                            <button id="import-data" class="btn btn-primary">Import Data</button>
-                            <input type="file" id="import-file" style="display: none;">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group" style="margin-top: 2rem;">
-                    <h3>Reset Data</h3>
-                    <div class="form-row">
-                        <div class="form-group" style="display: flex; align-items: flex-end;">
-                            <button id="reset-transactions" class="btn btn-danger">Reset Transaksi</button>
-                        </div>
-                        <div class="form-group" style="display: flex; align-items: flex-end;">
-                            <button id="reset-products" class="btn btn-danger">Reset Produk</button>
-                        </div>
-                        <div class="form-group" style="display: flex; align-items: flex-end;">
-                            <button id="reset-all" class="btn btn-danger">Reset Semua Data</button>
-                        </div>
-                    </div>
-                </div>
+            <div class="form-group" style="margin-top: 2rem;">
+                <label for="add-silica-location">Tambah Lokasi Silica Gel:</label>
+                <input type="text" id="add-silica-location" placeholder="Lokasi Baru">
             </div>
-        </main>
+            
+            <button id="add-silica" type="button">Tambah Silica Gel</button>
+        </div>
+        
     </div>
 
-    <!-- Tambahkan Chart.js untuk visualisasi data -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <script>
-        // Data aplikasi
-        const appData = {
-            settings: {
-                filamentCost: 250000, // Harga filamen per kg (Rp)
-                electricityCost: 1500, // Biaya listrik per kWh (Rp)
-                printerWattage: 350, // Daya printer dalam watt
-                silicaCost: 500, // Biaya silica gel per print (Rp)
-                otherCosts: 1000, // Biaya lain per print (Rp)
-                profitMargin: 30 // Target margin keuntungan (%)
-            },
-            products: [],
-            transactions: []
-        };
-
-        // Inisialisasi aplikasi saat halaman dimuat
+        // Set current date
         document.addEventListener('DOMContentLoaded', function() {
-            // Load data dari localStorage jika ada
-            loadData();
-            
-            // Set tanggal hari ini
-            const today = new Date();
-            document.getElementById('current-date').textContent = formatDate(today);
-            document.getElementById('transaction-date').valueAsDate = today;
-            
-            // Set default tanggal untuk laporan mingguan
-            const startOfWeek = getStartOfWeek(today);
-            const endOfWeek = getEndOfWeek(today);
-            document.getElementById('weekly-start-date').valueAsDate = startOfWeek;
-            document.getElementById('weekly-end-date').valueAsDate = endOfWeek;
-            
-            // Set default bulan dan tahun untuk laporan bulanan
-            document.getElementById('month-select').value = today.getMonth();
-            document.getElementById('year-select').value = today.getFullYear();
-            
-            // Setup tab navigation
-            setupTabs();
-            
-            // Setup event listeners
-            setupEventListeners();
-            
-            // Update tampilan
-            updateDailyView();
-            updateProductsTable();
-            updateSettingsForm();
-            
-            // Generate laporan mingguan dan bulanan default
-            generateWeeklyReport();
-            generateMonthlyReport();
-        });
 
-        // Fungsi untuk memuat data dari localStorage
-        function loadData() {
-            const savedData = localStorage.getItem('3dPrintingFinanceApp');
-            if (savedData) {
-                const parsedData = JSON.parse(savedData);
-                appData.settings = parsedData.settings || appData.settings;
-                appData.products = parsedData.products || appData.products;
-                appData.transactions = parsedData.transactions || appData.transactions;
-            }
-        }
-
-        // Fungsi untuk menyimpan data ke localStorage
-        function saveData() {
-            localStorage.setItem('3dPrintingFinanceApp', JSON.stringify(appData));
-        }
-
-        // Fungsi untuk mengatur tab navigation
-        function setupTabs() {
-            const tabButtons = document.querySelectorAll('.tab-btn');
+            loadAllProducts();
+            loadAllFilaments();
             
-            tabButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    // Hapus kelas active dari semua tab dan tombol
-                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            // Update tab navigation to reload when switching tabs
+            const tabLinks = document.querySelectorAll('.tab-link');
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
                     
-                    // Tambahkan kelas active ke tab dan tombol yang dipilih
-                    const tabId = this.getAttribute('data-tab');
+                    // Deactivate all tabs
+                    document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    
+                    // Activate selected tab
                     this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab');
                     document.getElementById(tabId).classList.add('active');
                     
-                    // Update tampilan yang sesuai
-                    if (tabId === 'daily-tab') {
-                        updateDailyView();
-                    } else if (tabId === 'products-tab') {
-                        updateProductsTable();
-                    } else if (tabId === 'settings-tab') {
-                        updateSettingsForm();
-                    } else if (tabId === 'weekly-tab') {
-                        generateWeeklyReport();
-                    } else if (tabId === 'monthly-tab') {
-                        generateMonthlyReport();
+                    // Load data for the tab
+                    if (tabId === 'daily') {
+                        loadDailyRecords();
+                    } else if (tabId === 'weekly') {
+                        loadWeeklyRecords();
+                    } else if (tabId === 'monthly') {
+                        loadMonthlyRecords();
+                    } else if (tabId === 'products') {
+                        loadAllProducts();
+                    } else if (tabId === 'inventory') {
+                        loadAllFilaments();
                     }
                 });
             });
-        }
 
-        // Fungsi untuk mengatur event listeners
-        function setupEventListeners() {
-            // Form transaksi harian
-            document.getElementById('daily-form').addEventListener('submit', saveDailyTransaction);
-            
-            // Pilihan produk
-            document.getElementById('product-select').addEventListener('change', function() {
-                const customFields = document.getElementById('custom-product-fields');
-                if (this.value === 'custom') {
-                    customFields.style.display = 'block';
-                    document.getElementById('calculation-result').style.display = 'none';
-                } else {
-                    customFields.style.display = 'none';
-                    calculateProductCost(this.value);
-                }
-            });
-            
-            // Status pembayaran
-            document.getElementById('payment-status').addEventListener('change', function() {
-                const dpField = document.getElementById('dp-amount-field');
-                dpField.style.display = this.value === 'DP' ? 'block' : 'none';
-            });
-            
-            // Form produk
-            document.getElementById('product-form').addEventListener('submit', saveProduct);
-            
-            // Form pengaturan
-            document.getElementById('settings-form').addEventListener('submit', saveSettings);
-            
-            // Generate laporan mingguan
-            document.getElementById('generate-weekly-report').addEventListener('click', generateWeeklyReport);
-            
-            // Generate laporan bulanan
-            document.getElementById('generate-monthly-report').addEventListener('click', generateMonthlyReport);
-            
-            // Export data
-            document.getElementById('export-data').addEventListener('click', exportData);
-            
-            // Import data
-            document.getElementById('import-data').addEventListener('click', function() {
-                document.getElementById('import-file').click();
-            });
-            
-            document.getElementById('import-file').addEventListener('change', importData);
-            
-            // Reset data
-            document.getElementById('reset-transactions').addEventListener('click', function() {
-                if (confirm('Apakah Anda yakin ingin menghapus semua data transaksi?')) {
-                    appData.transactions = [];
-                    saveData();
-                    updateDailyView();
-                    alert('Semua data transaksi telah dihapus.');
-                }
-            });
-            
-            document.getElementById('reset-products').addEventListener('click', function() {
-                if (confirm('Apakah Anda yakin ingin menghapus semua data produk?')) {
-                    appData.products = [];
-                    saveData();
-                    updateProductsTable();
-                    alert('Semua data produk telah dihapus.');
-                }
-            });
-            
-            document.getElementById('reset-all').addEventListener('click', function() {
-                if (confirm('Apakah Anda yakin ingin menghapus SEMUA data (transaksi, produk, dan pengaturan)?')) {
-                    localStorage.removeItem('3dPrintingFinanceApp');
-                    location.reload();
-                }
-            });
-        }
 
-        // Fungsi untuk menyimpan transaksi harian
-        function saveDailyTransaction(e) {
-            e.preventDefault();
-            
-            const date = document.getElementById('transaction-date').value;
-            const customerName = document.getElementById('customer-name').value;
-            const productId = document.getElementById('product-select').value;
-            const quantity = parseInt(document.getElementById('product-quantity').value);
-            const paymentStatus = document.getElementById('payment-status').value;
-            const dpAmount = paymentStatus === 'DP' ? parseInt(document.getElementById('dp-amount').value) : 0;
-            
-            let productName, weight, printTime, price;
-            
-            if (productId === 'custom') {
-                productName = document.getElementById('custom-product-name').value;
-                weight = parseInt(document.getElementById('custom-product-weight').value);
-                printTime = parseFloat(document.getElementById('custom-product-time').value);
-                price = parseInt(document.getElementById('custom-product-price').value);
-            } else {
-                const product = appData.products.find(p => p.id === productId);
-                if (!product) {
-                    alert('Produk tidak ditemukan');
-                    return;
-                }
-                productName = product.name;
-                weight = product.weight;
-                printTime = product.printTime;
-                price = product.price;
-            }
-            
-            // Hitung biaya produksi
-            const filamentCost = (weight / 1000) * appData.settings.filamentCost;
-            const electricityCost = (appData.settings.printerWattage * printTime / 1000) * appData.settings.electricityCost;
-            const totalCost = filamentCost + electricityCost + appData.settings.silicaCost + appData.settings.otherCosts;
-            const profit = price - totalCost;
-            const profitPercentage = (profit / totalCost) * 100;
-            
-            // Buat transaksi baru
-            const transaction = {
-                id: Date.now().toString(),
-                date: date,
-                customerName: customerName,
-                productName: productName,
-                quantity: quantity,
-                weight: weight,
-                printTime: printTime,
-                price: price,
-                paymentStatus: paymentStatus,
-                dpAmount: dpAmount,
-                filamentCost: filamentCost,
-                electricityCost: electricityCost,
-                totalCost: totalCost,
-                profit: profit,
-                profitPercentage: profitPercentage
-            };
-            
-            // Tambahkan ke daftar transaksi
-            appData.transactions.push(transaction);
-            saveData();
-            
-            // Reset form
-            e.target.reset();
-            document.getElementById('transaction-date').valueAsDate = new Date();
-            document.getElementById('product-quantity').value = 1;
-            document.getElementById('custom-product-fields').style.display = 'none';
-            document.getElementById('dp-amount-field').style.display = 'none';
-            document.getElementById('calculation-result').style.display = 'none';
-            
-            // Update tampilan
-            updateDailyView();
-            
-            alert('Transaksi berhasil disimpan!');
-        }
-
-        // Fungsi untuk menghitung biaya produk
-        function calculateProductCost(productId) {
-            const product = appData.products.find(p => p.id === productId);
-            if (!product) return;
-            
-            const quantity = parseInt(document.getElementById('product-quantity').value) || 1;
-            const weight = product.weight * quantity;
-            const printTime = product.printTime * quantity;
-            const price = product.price * quantity;
-            
-            const filamentCost = (weight / 1000) * appData.settings.filamentCost;
-            const electricityCost = (appData.settings.printerWattage * printTime / 1000) * appData.settings.electricityCost;
-            const totalCost = filamentCost + electricityCost + appData.settings.silicaCost + appData.settings.otherCosts;
-            const profit = price - totalCost;
-            const profitPercentage = (profit / totalCost) * 100;
-            
-            // Update tampilan kalkulasi
-            document.getElementById('calc-filament-weight').textContent = weight;
-            document.getElementById('calc-print-time').textContent = printTime.toFixed(1);
-            document.getElementById('calc-filament-cost').textContent = Math.round(filamentCost).toLocaleString();
-            document.getElementById('calc-electricity-cost').textContent = Math.round(electricityCost).toLocaleString();
-            document.getElementById('calc-total-cost').textContent = Math.round(totalCost).toLocaleString();
-            document.getElementById('calc-selling-price').textContent = Math.round(price).toLocaleString();
-            document.getElementById('calc-profit-margin').textContent = Math.round(profit).toLocaleString();
-            document.getElementById('calc-profit-percentage').textContent = profitPercentage.toFixed(1);
-            
-            document.getElementById('calculation-result').style.display = 'block';
-        }
-
-        // Fungsi untuk menyimpan produk
-        function saveProduct(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('product-name').value;
-            const weight = parseInt(document.getElementById('product-weight').value);
-            const printTime = parseFloat(document.getElementById('product-time').value);
-            const price = parseInt(document.getElementById('product-price').value);
-            const category = document.getElementById('product-category').value;
-            const description = document.getElementById('product-description').value;
-            
-            // Hitung biaya produksi
-            const filamentCost = (weight / 1000) * appData.settings.filamentCost;
-            const electricityCost = (appData.settings.printerWattage * printTime / 1000) * appData.settings.electricityCost;
-            const totalCost = filamentCost + electricityCost + appData.settings.silicaCost + appData.settings.otherCosts;
-            const profit = price - totalCost;
-            const profitPercentage = (profit / totalCost) * 100;
-            
-            // Buat produk baru
-            const product = {
-                id: Date.now().toString(),
-                name: name,
-                weight: weight,
-                printTime: printTime,
-                price: price,
-                category: category,
-                description: description,
-                filamentCost: filamentCost,
-                electricityCost: electricityCost,
-                totalCost: totalCost,
-                profit: profit,
-                profitPercentage: profitPercentage,
-                createdAt: new Date().toISOString()
-            };
-            
-            // Tambahkan ke daftar produk
-            appData.products.push(product);
-            saveData();
-            
-            // Reset form
-            e.target.reset();
-            
-            // Update tampilan
-            updateProductsTable();
-            updateProductSelect();
-            
-            alert('Produk berhasil disimpan!');
-        }
-
-        // Fungsi untuk menyimpan pengaturan
-        function saveSettings(e) {
-            e.preventDefault();
-            
-            appData.settings = {
-                filamentCost: parseInt(document.getElementById('filament-cost').value),
-                electricityCost: parseInt(document.getElementById('electricity-cost').value),
-                printerWattage: parseInt(document.getElementById('printer-wattage').value),
-                silicaCost: parseInt(document.getElementById('silica-cost').value),
-                otherCosts: parseInt(document.getElementById('other-costs').value),
-                profitMargin: parseInt(document.getElementById('profit-margin').value)
-            };
-            
-            saveData();
-            
-            alert('Pengaturan berhasil disimpan!');
-        }
-
-        // Fungsi untuk mengupdate tampilan harian
-        function updateDailyView() {
             const today = new Date();
-            const todayStr = formatDate(today, 'yyyy-mm-dd');
+            const dateInput = document.getElementById('date');
+            dateInput.value = today.toISOString().split('T')[0];
             
-            // Filter transaksi hari ini
-            const dailyTransactions = appData.transactions.filter(t => t.date === todayStr);
-            
-            // Update info box
-            document.getElementById('total-daily-transactions').textContent = dailyTransactions.length;
-            
-            const totalIncome = dailyTransactions.reduce((sum, t) => sum + t.price, 0);
-            document.getElementById('total-daily-income').textContent = `Rp ${totalIncome.toLocaleString()}`;
-            
-            // Update tabel transaksi
-            const tbody = document.getElementById('daily-transactions').querySelector('tbody');
-            tbody.innerHTML = '';
-            
-            dailyTransactions.forEach(transaction => {
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td>${formatDate(transaction.date)}</td>
-                    <td>${transaction.customerName}</td>
-                    <td>${transaction.productName}</td>
-                    <td>${transaction.quantity}</td>
-                    <td>${transaction.weight}</td>
-                    <td>${transaction.printTime.toFixed(1)}</td>
-                    <td>Rp ${transaction.price.toLocaleString()}</td>
-                    <td>${transaction.paymentStatus}</td>
-                    <td>
-                        <button class="btn-small btn-danger" data-id="${transaction.id}">Hapus</button>
-                    </td>
-                `;
-                
-                tbody.appendChild(row);
-            });
-            
-            // Tambahkan event listener untuk tombol hapus
-            document.querySelectorAll('#daily-transactions .btn-danger').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const id = this.getAttribute('data-id');
-                    deleteTransaction(id);
-                });
-            });
-            
-            // Update ringkasan harian
-            updateDailySummary(dailyTransactions);
-            
-            // Update dropdown produk
-            updateProductSelect();
-        }
+            // Initialize data storage if not exists
+            if (!localStorage.getItem('printJobs')) {
+                localStorage.setItem('printJobs', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('products')) {
+                const defaultProducts = {
+                };
 
-        // Fungsi untuk mengupdate dropdown pilihan produk
-        function updateProductSelect() {
-            const select = document.getElementById('product-select');
-            
-            // Simpan nilai yang dipilih saat ini
-            const selectedValue = select.value;
-            
-            // Hapus semua opsi kecuali yang pertama dan custom
-            while (select.options.length > 2) {
-                select.remove(1);
+                localStorage.setItem('products', JSON.stringify(defaultProducts));
+            }
+            if (!localStorage.getItem('filamentInventory')) {
+                const defaultFilaments = {
+                };
+
+                localStorage.setItem('filamentInventory', JSON.stringify(defaultFilaments));
             }
             
-            // Tambahkan produk dari database
-            appData.products.forEach(product => {
-                const option = document.createElement('option');
-                option.value = product.id;
-                option.textContent = product.name;
-                select.insertBefore(option, select.lastChild);
-            });
-            
-            // Kembalikan nilai yang dipilih sebelumnya jika masih ada
-            if (selectedValue && (selectedValue === 'custom' || appData.products.some(p => p.id === selectedValue))) {
-                select.value = selectedValue;
-            }
-        }
+            loadDailyRecords();
+        });
 
-        // Fungsi untuk mengupdate ringkasan harian
-        function updateDailySummary(transactions) {
-            const totalTransactions = transactions.length;
-            const totalIncome = transactions.reduce((sum, t) => sum + t.price, 0);
-            const totalCosts = transactions.reduce((sum, t) => sum + t.totalCost, 0);
-            const totalProfit = transactions.reduce((sum, t) => sum + t.profit, 0);
-            const totalFilament = transactions.reduce((sum, t) => sum + t.weight, 0);
-            const totalPrintTime = transactions.reduce((sum, t) => sum + t.printTime, 0);
-            
-            document.getElementById('summary-daily-transactions').textContent = totalTransactions;
-            document.getElementById('summary-daily-income').textContent = `Rp ${totalIncome.toLocaleString()}`;
-            document.getElementById('summary-daily-costs').textContent = `Rp ${totalCosts.toLocaleString()}`;
-            document.getElementById('summary-daily-profit').textContent = `Rp ${totalProfit.toLocaleString()}`;
-            document.getElementById('summary-daily-filament').textContent = `${totalFilament} gram`;
-            document.getElementById('summary-daily-print-time').textContent = `${totalPrintTime.toFixed(1)} jam`;
-        }
-
-        // Fungsi untuk mengupdate tabel produk
-        function updateProductsTable() {
-            const tbody = document.getElementById('products-table').querySelector('tbody');
-            tbody.innerHTML = '';
-            
-            appData.products.forEach(product => {
-                const row = document.createElement('tr');
+        // Tab Navigation
+        const tabLinks = document.querySelectorAll('.tab-link');
+        tabLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
                 
-                row.innerHTML = `
-                    <td>${product.name}</td>
-                    <td>${product.category || '-'}</td>
-                    <td>${product.weight}</td>
-                    <td>${product.printTime.toFixed(1)}</td>
-                    <td>Rp ${product.price.toLocaleString()}</td>
-                    <td>Rp ${Math.round(product.totalCost).toLocaleString()}</td>
-                    <td>${product.profitPercentage.toFixed(1)}%</td>
-                    <td>
-                        <button class="btn-small btn-danger" data-id="${product.id}">Hapus</button>
-                    </td>
-                `;
+                // Deactivate all tabs
+                document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
                 
-                tbody.appendChild(row);
+                // Activate selected tab
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+                
+                // Load data for the tab
+                if (tabId === 'daily') {
+                    loadDailyRecords();
+                } else if (tabId === 'weekly') {
+                    loadWeeklyRecords();
+                } else if (tabId === 'monthly') {
+                    loadMonthlyRecords();
+                }
             });
+        });
+
+        // Product selection and automatic calculation
+        const productSelect = document.getElementById('product-select');
+        productSelect.addEventListener('change', function() {
+            const productId = this.value;
+            if (!productId) return;
             
-            // Tambahkan event listener untuk tombol hapus
-            document.querySelectorAll('#products-table .btn-danger').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const id = this.getAttribute('data-id');
-                    deleteProduct(id);
-                });
+            const products = JSON.parse(localStorage.getItem('products'));
+            const product = products[productId];
+            
+            if (product) {
+                document.getElementById('filament-usage').value = product.filament;
+                document.getElementById('print-time').value = product.time;
+                document.getElementById('selling-price').value = product.price;
+                
+                calculateCosts();
+            }
+        });
+
+        // Input change triggers calculation
+        ['filament-usage', 'print-time', 'electricity-rate', 'printer-power'].forEach(id => {
+            document.getElementById(id).addEventListener('input', calculateCosts);
+        });
+
+        // Quick add from product cards
+        document.querySelectorAll('.quick-add').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const productCard = this.closest('.product-card');
+                const productId = productCard.getAttribute('data-product');
+                
+                // Switch to daily tab
+                document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                
+                document.querySelector('.tab-link[data-tab="daily"]').classList.add('active');
+                document.getElementById('daily').classList.add('active');
+                
+                // Set product
+                document.getElementById('product-select').value = productId;
+                
+                // Trigger change event
+                const event = new Event('change');
+                document.getElementById('product-select').dispatchEvent(event);
+                
+                // Scroll to form
+                document.getElementById('product-select').scrollIntoView({ behavior: 'smooth' });
             });
-        }
+        });
 
-        // Fungsi untuk mengupdate form pengaturan
-        function updateSettingsForm() {
-            document.getElementById('filament-cost').value = appData.settings.filamentCost;
-            document.getElementById('electricity-cost').value = appData.settings.electricityCost;
-            document.getElementById('printer-wattage').value = appData.settings.printerWattage;
-            document.getElementById('silica-cost').value = appData.settings.silicaCost;
-            document.getElementById('other-costs').value = appData.settings.otherCosts;
-            document.getElementById('profit-margin').value = appData.settings.profitMargin;
-        }
-
-        // Fungsi untuk menghapus transaksi
-        function deleteTransaction(id) {
-            if (confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
-                appData.transactions = appData.transactions.filter(t => t.id !== id);
-                saveData();
-                updateDailyView();
-            }
-        }
-
-        // Fungsi untuk menghapus produk
-        function deleteProduct(id) {
-            if (confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
-                appData.products = appData.products.filter(p => p.id !== id);
-                saveData();
-                updateProductsTable();
-                updateProductSelect();
-            }
-        }
-
-        // Fungsi untuk generate laporan mingguan
-        function generateWeeklyReport() {
-            const startDate = document.getElementById('weekly-start-date').value;
-            const endDate = document.getElementById('weekly-end-date').value;
+        // Save daily record
+        document.getElementById('save-daily').addEventListener('click', function() {
+            const date = document.getElementById('date').value;
+            const productId = document.getElementById('product-select').value;
+            const filamentType = document.getElementById('filament-type').value;
+            const filamentUsage = parseFloat(document.getElementById('filament-usage').value) || 0;
+            const printTime = parseFloat(document.getElementById('print-time').value) || 0;
+            const customerName = document.getElementById('customer-name').value;
+            const sellingPrice = parseFloat(document.getElementById('selling-price').value) || 0;
+            const notes = document.getElementById('notes').value;
             
-            if (!startDate || !endDate) {
-                alert('Silakan pilih tanggal mulai dan tanggal akhir');
+            // Get product name
+            let productName = '';
+            if (productId) {
+                const products = JSON.parse(localStorage.getItem('products'));
+                productName = products[productId].name;
+            }
+            
+            // Calculate costs
+            const filamentCost = calculateFilamentCost(filamentType, filamentUsage);
+            const electricityCost = calculateElectricityCost(printTime);
+            const totalCost = filamentCost + electricityCost;
+            const profit = sellingPrice - totalCost;
+            
+            // Create record object
+            const record = {
+                date: date,
+                productId: productId,
+                productName: productName,
+                filamentType: filamentType,
+                filamentUsage: filamentUsage,
+                printTime: printTime,
+                filamentCost: filamentCost,
+                electricityCost: electricityCost,
+                totalCost: totalCost,
+                sellingPrice: sellingPrice,
+                profit: profit,
+                customerName: customerName,
+                notes: notes,
+                timestamp: new Date().getTime()
+            };
+            
+            // Save record
+            const printJobs = JSON.parse(localStorage.getItem('printJobs'));
+            printJobs.push(record);
+            localStorage.setItem('printJobs', JSON.stringify(printJobs));
+            
+            // Update filament inventory
+            updateFilamentInventory(filamentType, filamentUsage);
+            
+            // Reload records
+            loadDailyRecords();
+            
+            // Clear form
+            document.getElementById('product-select').value = '';
+            document.getElementById('filament-usage').value = '';
+            document.getElementById('print-time').value = '';
+            document.getElementById('customer-name').value = '';
+            document.getElementById('selling-price').value = '';
+            document.getElementById('notes').value = '';
+            document.getElementById('filament-cost').textContent = 'Rp0';
+            document.getElementById('electricity-cost').textContent = 'Rp0';
+            document.getElementById('total-cost').textContent = 'Rp0';
+            
+            alert('Data berhasil disimpan!');
+        });
+
+        // Add new product
+        document.getElementById('save-product').addEventListener('click', function() {
+            const name = document.getElementById('new-product-name').value;
+            const filament = parseFloat(document.getElementById('new-product-filament').value) || 0;
+            const time = parseFloat(document.getElementById('new-product-time').value) || 0;
+            const price = parseFloat(document.getElementById('new-product-price').value) || 0;
+            
+            if (!name) {
+                alert('Harap isi nama produk!');
                 return;
             }
             
-            // Filter transaksi dalam rentang tanggal
-            const weeklyTransactions = appData.transactions.filter(t => {
-                return t.date >= startDate && t.date <= endDate;
-            });
+            // Create product ID from name
+            const productId = name.toLowerCase().replace(/\s+/g, '-');
             
-            // Kelompokkan transaksi per hari
-            const transactionsByDay = {};
-            weeklyTransactions.forEach(t => {
-                if (!transactionsByDay[t.date]) {
-                    transactionsByDay[t.date] = [];
-                }
-                transactionsByDay[t.date].push(t);
-            });
+            // Save product
+            const products = JSON.parse(localStorage.getItem('products'));
+            products[productId] = { name, filament, time, price };
+            localStorage.setItem('products', JSON.stringify(products));
             
-            // Urutkan tanggal
-            const sortedDates = Object.keys(transactionsByDay).sort();
+            // Clear form
+            document.getElementById('new-product-name').value = '';
+            document.getElementById('new-product-filament').value = '';
+            document.getElementById('new-product-time').value = '';
+            document.getElementById('new-product-price').value = '';
             
-            // Update info box
-            document.getElementById('weekly-period').textContent = `${formatDate(startDate)} - ${formatDate(endDate)}`;
-            document.getElementById('weekly-total-transactions').textContent = weeklyTransactions.length;
+            alert('Produk berhasil disimpan!');
             
-            const totalIncome = weeklyTransactions.reduce((sum, t) => sum + t.price, 0);
-            document.getElementById('weekly-total-income').textContent = `Rp ${totalIncome.toLocaleString()}`;
-            
-            // Update tabel summary
-            const tbody = document.getElementById('weekly-summary-table').querySelector('tbody');
-            tbody.innerHTML = '';
-            
-            sortedDates.forEach(date => {
-                const dayTransactions = transactionsByDay[date];
-                const dayIncome = dayTransactions.reduce((sum, t) => sum + t.price, 0);
-                const dayCosts = dayTransactions.reduce((sum, t) => sum + t.totalCost, 0);
-                const dayProfit = dayTransactions.reduce((sum, t) => sum + t.profit, 0);
-                const dayFilament = dayTransactions.reduce((sum, t) => sum + t.weight, 0);
-                const dayPrintTime = dayTransactions.reduce((sum, t) => sum + t.printTime, 0);
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${formatDate(date)}</td>
-                    <td>${dayTransactions.length}</td>
-                    <td>Rp ${dayIncome.toLocaleString()}</td>
-                    <td>Rp ${dayCosts.toLocaleString()}</td>
-                    <td>Rp ${dayProfit.toLocaleString()}</td>
-                    <td>${dayFilament}</td>
-                    <td>${dayPrintTime.toFixed(1)}</td>
-                `;
-                tbody.appendChild(row);
-            });
-            
-            // Update ringkasan mingguan
-            updateWeeklySummary(weeklyTransactions, sortedDates.length);
-            
-            // Buat chart
-            createWeeklyChart(sortedDates, transactionsByDay);
-        }
+            // Reload product grid
+            location.reload();
+        });
 
-        // Fungsi untuk mengupdate ringkasan mingguan
-        function updateWeeklySummary(transactions, daysCount) {
-            const totalTransactions = transactions.length;
-            const totalIncome = transactions.reduce((sum, t) => sum + t.price, 0);
-            const totalCosts = transactions.reduce((sum, t) => sum + t.totalCost, 0);
-            const totalProfit = transactions.reduce((sum, t) => sum + t.profit, 0);
-            const totalFilament = transactions.reduce((sum, t) => sum + t.weight, 0);
-            const totalPrintTime = transactions.reduce((sum, t) => sum + t.printTime, 0);
+        // Add new filament
+        document.getElementById('add-filament').addEventListener('click', function() {
+            const type = document.getElementById('add-filament-type').value;
+            const amount = parseFloat(document.getElementById('add-filament-amount').value) || 0;
+            const price = parseFloat(document.getElementById('add-filament-price').value) || 0;
             
-            document.getElementById('summary-weekly-transactions').textContent = totalTransactions;
-            document.getElementById('summary-weekly-income').textContent = `Rp ${totalIncome.toLocaleString()}`;
-            document.getElementById('summary-weekly-costs').textContent = `Rp ${totalCosts.toLocaleString()}`;
-            document.getElementById('summary-weekly-profit').textContent = `Rp ${totalProfit.toLocaleString()}`;
-            document.getElementById('summary-weekly-filament').textContent = `${totalFilament} gram`;
-            document.getElementById('summary-weekly-print-time').textContent = `${totalPrintTime.toFixed(1)} jam`;
-            
-            const avgTransactions = daysCount > 0 ? (totalTransactions / daysCount).toFixed(1) : 0;
-            const avgIncome = daysCount > 0 ? (totalIncome / daysCount).toFixed(0) : 0;
-            
-            document.getElementById('summary-weekly-avg-transactions').textContent = avgTransactions;
-            document.getElementById('summary-weekly-avg-income').textContent = `Rp ${avgIncome}`;
-        }
-
-        // Fungsi untuk membuat chart mingguan
-        function createWeeklyChart(dates, transactionsByDay) {
-            const ctx = document.getElementById('weekly-chart').getContext('2d');
-            
-            // Hapus chart sebelumnya jika ada
-            if (window.weeklyChart) {
-                window.weeklyChart.destroy();
+            if (!type || amount <= 0 || price <= 0) {
+                alert('Harap isi semua data filamen dengan benar!');
+                return;
             }
             
-            const incomeData = dates.map(date => {
-                const dayTransactions = transactionsByDay[date];
-                return dayTransactions.reduce((sum, t) => sum + t.price, 0);
-            });
+            // Create filament ID from type
+            const filamentId = type.toLowerCase().replace(/\s+/g, '-');
             
-            const costData = dates.map(date => {
-                const dayTransactions = transactionsByDay[date];
-                return dayTransactions.reduce((sum, t) => sum + t.totalCost, 0);
-            });
+            // Save filament
+            const filaments = JSON.parse(localStorage.getItem('filamentInventory'));
+            filaments[filamentId] = { name: type, initial: amount, used: 0, price: price };
+            localStorage.setItem('filamentInventory', JSON.stringify(filaments));
             
-            window.weeklyChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: dates.map(date => formatDate(date)),
-                    datasets: [
-                        {
-                            label: 'Pendapatan',
-                            data: incomeData,
-                            backgroundColor: '#4e73df',
-                            borderColor: '#4e73df',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Biaya',
-                            data: costData,
-                            backgroundColor: '#e74a3b',
-                            borderColor: '#e74a3b',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return 'Rp ' + value.toLocaleString();
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': Rp ' + context.raw.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
+            // Clear form
+            document.getElementById('add-filament-type').value = '';
+            document.getElementById('add-filament-amount').value = '';
+            document.getElementById('add-filament-price').value = '';
+            
+            alert('Filamen berhasil ditambahkan!');
+            
+            // Reload filament inventory
+            location.reload();
+        });
 
-        // Fungsi untuk generate laporan bulanan
-        function generateMonthlyReport() {
-            const month = parseInt(document.getElementById('month-select').value);
-            const year = parseInt(document.getElementById('year-select').value);
+        // Add new silica gel location
+        document.getElementById('add-silica').addEventListener('click', function() {
+            const location = document.getElementById('add-silica-location').value;
             
-            // Filter transaksi bulan dan tahun yang dipilih
-            const monthlyTransactions = appData.transactions.filter(t => {
-                const date = new Date(t.date);
-                return date.getMonth() === month && date.getFullYear() === year;
-            });
-            
-            // Kelompokkan transaksi per minggu
-            const transactionsByWeek = {};
-            monthlyTransactions.forEach(t => {
-                const date = new Date(t.date);
-                const weekNumber = getWeekOfMonth(date);
-                
-                if (!transactionsByWeek[weekNumber]) {
-                    transactionsByWeek[weekNumber] = [];
-                }
-                transactionsByWeek[weekNumber].push(t);
-            });
-            
-            // Urutkan minggu
-            const sortedWeeks = Object.keys(transactionsByWeek).sort((a, b) => a - b);
-            
-            // Update info box
-            const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            document.getElementById('monthly-period').textContent = `${monthNames[month]} ${year}`;
-            document.getElementById('monthly-total-transactions').textContent = monthlyTransactions.length;
-            
-            const totalIncome = monthlyTransactions.reduce((sum, t) => sum + t.price, 0);
-            document.getElementById('monthly-total-income').textContent = `Rp ${totalIncome.toLocaleString()}`;
-            
-            // Update tabel summary
-            const tbody = document.getElementById('monthly-summary-table').querySelector('tbody');
-            tbody.innerHTML = '';
-            
-            sortedWeeks.forEach(week => {
-                const weekTransactions = transactionsByWeek[week];
-                const weekIncome = weekTransactions.reduce((sum, t) => sum + t.price, 0);
-                const weekCosts = weekTransactions.reduce((sum, t) => sum + t.totalCost, 0);
-                const weekProfit = weekTransactions.reduce((sum, t) => sum + t.profit, 0);
-                const weekFilament = weekTransactions.reduce((sum, t) => sum + t.weight, 0);
-                const weekPrintTime = weekTransactions.reduce((sum, t) => sum + t.printTime, 0);
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>Minggu ${week}</td>
-                    <td>${weekTransactions.length}</td>
-                    <td>Rp ${weekIncome.toLocaleString()}</td>
-                    <td>Rp ${weekCosts.toLocaleString()}</td>
-                    <td>Rp ${weekProfit.toLocaleString()}</td>
-                    <td>${weekFilament}</td>
-                    <td>${weekPrintTime.toFixed(1)}</td>
-                `;
-                tbody.appendChild(row);
-            });
-            
-            // Update tabel produk terlaris
-            updateTopProductsTable(monthlyTransactions);
-            
-            // Update ringkasan bulanan
-            updateMonthlySummary(monthlyTransactions, month, year);
-            
-            // Buat chart
-            createMonthlyChart(sortedWeeks, transactionsByWeek);
-        }
-
-        // Fungsi untuk mengupdate tabel produk terlaris
-        function updateTopProductsTable(transactions) {
-            // Kelompokkan transaksi per produk
-            const productsSummary = {};
-            
-            transactions.forEach(t => {
-                if (!productsSummary[t.productName]) {
-                    productsSummary[t.productName] = {
-                        count: 0,
-                        totalIncome: 0,
-                        totalFilament: 0,
-                        totalPrintTime: 0
-                    };
-                }
-                
-                productsSummary[t.productName].count += t.quantity;
-                productsSummary[t.productName].totalIncome += t.price;
-                productsSummary[t.productName].totalFilament += t.weight;
-                productsSummary[t.productName].totalPrintTime += t.printTime;
-            });
-            
-            // Urutkan berdasarkan jumlah terjual
-            const sortedProducts = Object.keys(productsSummary).sort((a, b) => productsSummary[b].count - productsSummary[a].count);
-            
-            // Update tabel
-            const tbody = document.getElementById('top-products-table').querySelector('tbody');
-            tbody.innerHTML = '';
-            
-            sortedProducts.slice(0, 5).forEach(productName => {
-                const summary = productsSummary[productName];
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td>${productName}</td>
-                    <td>${summary.count}</td>
-                    <td>Rp ${summary.totalIncome.toLocaleString()}</td>
-                    <td>${summary.totalFilament}</td>
-                    <td>${summary.totalPrintTime.toFixed(1)}</td>
-                `;
-                
-                tbody.appendChild(row);
-            });
-        }
-
-        // Fungsi untuk mengupdate ringkasan bulanan
-        function updateMonthlySummary(transactions, month, year) {
-            const totalTransactions = transactions.length;
-            const totalIncome = transactions.reduce((sum, t) => sum + t.price, 0);
-            const totalCosts = transactions.reduce((sum, t) => sum + t.totalCost, 0);
-            const totalProfit = transactions.reduce((sum, t) => sum + t.profit, 0);
-            const totalFilament = transactions.reduce((sum, t) => sum + t.weight, 0);
-            const totalPrintTime = transactions.reduce((sum, t) => sum + t.printTime, 0);
-            
-            // Hitung jumlah hari dalam bulan
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            
-            document.getElementById('summary-monthly-transactions').textContent = totalTransactions;
-            document.getElementById('summary-monthly-income').textContent = `Rp ${totalIncome.toLocaleString()}`;
-            document.getElementById('summary-monthly-costs').textContent = `Rp ${totalCosts.toLocaleString()}`;
-            document.getElementById('summary-monthly-profit').textContent = `Rp ${totalProfit.toLocaleString()}`;
-            document.getElementById('summary-monthly-filament').textContent = `${totalFilament} gram`;
-            document.getElementById('summary-monthly-print-time').textContent = `${totalPrintTime.toFixed(1)} jam`;
-            
-            const avgTransactions = daysInMonth > 0 ? (totalTransactions / daysInMonth).toFixed(1) : 0;
-            const avgIncome = daysInMonth > 0 ? (totalIncome / daysInMonth).toFixed(0) : 0;
-            
-            document.getElementById('summary-monthly-avg-transactions').textContent = avgTransactions;
-            document.getElementById('summary-monthly-avg-income').textContent = `Rp ${avgIncome}`;
-        }
-
-        // Fungsi untuk membuat chart bulanan
-        function createMonthlyChart(weeks, transactionsByWeek) {
-            const ctx = document.getElementById('monthly-chart').getContext('2d');
-            
-            // Hapus chart sebelumnya jika ada
-            if (window.monthlyChart) {
-                window.monthlyChart.destroy();
+            if (!location) {
+                alert('Harap isi lokasi silica gel!');
+                return;
             }
             
-            const incomeData = weeks.map(week => {
-                const weekTransactions = transactionsByWeek[week];
-                return weekTransactions.reduce((sum, t) => sum + t.price, 0);
-            });
+            // Add row to table
+            const today = new Date().toLocaleDateString('id-ID');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${location}</td>
+                <td>${today}</td>
+                <td>-</td>
+                <td>🔵 Aktif</td>
+                <td><button class="update-silica">Update</button></td>
+            `;
             
-            const costData = weeks.map(week => {
-                const weekTransactions = transactionsByWeek[week];
-                return weekTransactions.reduce((sum, t) => sum + t.totalCost, 0);
-            });
+            document.querySelector('#silica-inventory tbody').appendChild(row);
             
-            window.monthlyChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: weeks.map(week => `Minggu ${week}`),
-                    datasets: [
-                        {
-                            label: 'Pendapatan',
-                            data: incomeData,
-                            backgroundColor: '#4e73df',
-                            borderColor: '#4e73df',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Biaya',
-                            data: costData,
-                            backgroundColor: '#e74a3b',
-                            borderColor: '#e74a3b',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return 'Rp ' + value.toLocaleString();
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': Rp ' + context.raw.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
+            // Clear form
+            document.getElementById('add-silica-location').value = '';
+            
+            // Add event listener for new button
+            row.querySelector('.update-silica').addEventListener('click', updateSilicaStatus);
+        });
 
-        // Fungsi untuk export data ke JSON
-        function exportData() {
-            const dataStr = JSON.stringify(appData, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = `backup-data-3dprinting-${formatDate(new Date(), 'yyyy-mm-dd')}.json`;
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-        }
+        // Update silica gel status
+        document.querySelectorAll('.update-silica').forEach(btn => {
+            btn.addEventListener('click', updateSilicaStatus);
+        });
 
-        // Fungsi untuk import data dari JSON
-        function importData(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+        function updateSilicaStatus() {
+            const row = this.closest('tr');
+            const status = row.cells[3].textContent;
             
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedData = JSON.parse(e.target.result);
-                    
-                    if (confirm('Apakah Anda yakin ingin mengimpor data ini? Data saat ini akan diganti.')) {
-                        appData.settings = importedData.settings || appData.settings;
-                        appData.products = importedData.products || appData.products;
-                        appData.transactions = importedData.transactions || appData.transactions;
-                        
-                        saveData();
-                        location.reload();
-                    }
-                } catch (error) {
-                    alert('Gagal membaca file. Pastikan file yang dipilih valid.');
-                }
-            };
-            reader.readAsText(file);
-            
-            // Reset input file
-            e.target.value = '';
-        }
-
-        // Fungsi utilitas untuk memformat tanggal
-        function formatDate(date, format = 'dd-mm-yyyy') {
-            if (!date) return '';
-            
-            let dateObj;
-            if (typeof date === 'string') {
-                dateObj = new Date(date);
+            if (status.includes('Aktif')) {
+                row.cells[3].textContent = '🔴 Perlu Recharge';
             } else {
-                dateObj = date;
+                row.cells[2].textContent = new Date().toLocaleDateString('id-ID');
+                row.cells[3].textContent = '🔵 Aktif';
             }
-            
-            const day = String(dateObj.getDate()).padStart(2, '0');
-            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-            const year = dateObj.getFullYear();
-            
-            if (format === 'dd-mm-yyyy') {
-                return `${day}/${month}/${year}`;
-            } else if (format === 'yyyy-mm-dd') {
-                return `${year}-${month}-${day}`;
-            }
-            
-            return dateObj.toLocaleDateString();
         }
 
-        // Fungsi utilitas untuk mendapatkan awal minggu (Senin)
-        function getStartOfWeek(date) {
+        // Update filament inventory
+        document.querySelectorAll('.update-inventory').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const type = row.cells[0].textContent;
+                
+                const newAmount = prompt(`Tambah stok untuk ${type} (dalam gram):`, '0');
+                if (newAmount === null) return;
+                
+                const amount = parseFloat(newAmount) || 0;
+                if (amount <= 0) return;
+                
+                // Get filament ID
+                const filamentId = type.toLowerCase().replace(/\s+/g, '-');
+                
+                // Update inventory
+                const filaments = JSON.parse(localStorage.getItem('filamentInventory'));
+                if (filaments[filamentId]) {
+                    filaments[filamentId].initial += amount;
+                }
+                localStorage.setItem('filamentInventory', JSON.stringify(filaments));
+                
+                // Reload page
+                location.reload();
+            });
+        });
+
+        // Calculate costs based on inputs
+        function calculateCosts() {
+            const filamentType = document.getElementById('filament-type').value;
+            const filamentUsage = parseFloat(document.getElementById('filament-usage').value) || 0;
+            const printTime = parseFloat(document.getElementById('print-time').value) || 0;
+            
+            const filamentCost = calculateFilamentCost(filamentType, filamentUsage);
+            const electricityCost = calculateElectricityCost(printTime);
+            const totalCost = filamentCost + electricityCost;
+            
+            document.getElementById('filament-cost').textContent = 'Rp' + formatNumber(filamentCost);
+            document.getElementById('electricity-cost').textContent = 'Rp' + formatNumber(electricityCost);
+            document.getElementById('total-cost').textContent = 'Rp' + formatNumber(totalCost);
+        }
+
+        function calculateFilamentCost(filamentType, usage) {
+            const filaments = JSON.parse(localStorage.getItem('filamentInventory'));
+            if (filaments[filamentType]) {
+                // Calculate cost per gram from price per kg
+                const costPerGram = filaments[filamentType].price / 1000;
+                return costPerGram * usage;
+            }
+            return 0;
+        }
+
+        function calculateElectricityCost(hours) {
+            const powerConsumption = parseFloat(document.getElementById('printer-power').value) || 200; // Watts
+            const electricityRate = parseFloat(document.getElementById('electricity-rate').value) || 1444.70; // Rp per kWh
+            
+            // Convert watts to kilowatts and multiply by hours and rate
+            const kW = powerConsumption / 1000;
+            const kWh = kW * hours;
+            const cost = kWh * electricityRate;
+            
+            return cost;
+        }
+
+        function updateFilamentInventory(filamentType, usage) {
+            const filaments = JSON.parse(localStorage.getItem('filamentInventory'));
+            if (filaments[filamentType]) {
+                filaments[filamentType].used += usage;
+                localStorage.setItem('filamentInventory', JSON.stringify(filaments));
+            }
+        }
+
+        // Load daily records
+        function loadDailyRecords() {
+            const printJobs = JSON.parse(localStorage.getItem('printJobs'));
+            const tbody = document.querySelector('#daily-records tbody');
+            tbody.innerHTML = '';
+            
+            // Get today's date in YYYY-MM-DD format
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Filter records for today
+            const todayJobs = printJobs.filter(job => job.date === today);
+            
+            if (todayJobs.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="8" style="text-align: center;">Belum ada data untuk hari ini</td>';
+                tbody.appendChild(row);
+                return;
+            }
+            
+            todayJobs.forEach(job => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${job.productName}</td>
+                    <td>${getFilamentName(job.filamentType)}</td>
+                    <td>${job.filamentUsage}g</td>
+                    <td>${job.printTime} jam</td>
+                    <td>Rp${formatNumber(job.totalCost)}</td>
+                    <td>Rp${formatNumber(job.sellingPrice)}</td>
+                    <td>Rp${formatNumber(job.profit)}</td>
+                    <td>${job.customerName}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        };
+
+        // Load weekly records
+        function loadWeeklyRecords() {
+            const printJobs = JSON.parse(localStorage.getItem('printJobs'));
+            const tbody = document.querySelector('#weekly-records tbody');
+            tbody.innerHTML = '';
+            
+            if (!printJobs || printJobs.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="8" style="text-align: center;">Belum ada data</td>';
+                tbody.appendChild(row);
+                
+                // Set all summary values to 0
+                document.getElementById('weekly-products').textContent = '0';
+                document.getElementById('weekly-filament').textContent = '0g';
+                document.getElementById('weekly-time').textContent = '0 jam';
+                document.getElementById('weekly-revenue').textContent = 'Rp0';
+                document.getElementById('weekly-cost').textContent = 'Rp0';
+                document.getElementById('weekly-profit').textContent = 'Rp0';
+                return;
+            }
+            
+            // Get current week's start and end dates
+            const now = new Date();
+            const currentWeekStart = getWeekStartDate(now);
+            const currentWeekEnd = getWeekEndDate(now);
+            
+            // Filter records for current week
+            const weekJobs = printJobs.filter(job => {
+                const jobDate = new Date(job.date);
+                return jobDate >= currentWeekStart && jobDate <= currentWeekEnd;
+            });
+            
+            // Calculate totals
+            let totalProducts = 0;
+            let totalFilament = 0;
+            let totalTime = 0;
+            let totalRevenue = 0;
+            let totalCost = 0;
+            let totalProfit = 0;
+            
+            weekJobs.forEach(job => {
+                totalProducts++;
+                totalFilament += job.filamentUsage;
+                totalTime += job.printTime;
+                totalRevenue += job.sellingPrice;
+                totalCost += job.totalCost;
+                totalProfit += job.profit;
+                
+                // Add to table
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(job.date).toLocaleDateString('id-ID', { weekday: 'long' })}</td>
+                    <td>${job.productName}</td>
+                    <td>${getFilamentName(job.filamentType)}</td>
+                    <td>${job.filamentUsage}g</td>
+                    <td>${job.printTime} jam</td>
+                    <td>Rp${formatNumber(job.totalCost)}</td>
+                    <td>Rp${formatNumber(job.sellingPrice)}</td>
+                    <td>Rp${formatNumber(job.profit)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Update summary
+            document.getElementById('weekly-products').textContent = totalProducts;
+            document.getElementById('weekly-filament').textContent = `${formatNumber(totalFilament)}g`;
+            document.getElementById('weekly-time').textContent = `${formatNumber(totalTime)} jam`;
+            document.getElementById('weekly-revenue').textContent = `Rp${formatNumber(totalRevenue)}`;
+            document.getElementById('weekly-cost').textContent = `Rp${formatNumber(totalCost)}`;
+            document.getElementById('weekly-profit').textContent = `Rp${formatNumber(totalProfit)}`;
+            
+            // If no data for current week, show message
+            if (weekJobs.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="8" style="text-align: center;">Belum ada data untuk minggu ini</td>';
+                tbody.appendChild(row);
+            }
+        }
+
+        // Load monthly records
+        function loadMonthlyRecords() {
+            const printJobs = JSON.parse(localStorage.getItem('printJobs'));
+            const tbody = document.querySelector('#monthly-records tbody');
+            tbody.innerHTML = '';
+            
+            if (!printJobs || printJobs.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="8" style="text-align: center;">Belum ada data</td>';
+                tbody.appendChild(row);
+                
+                // Set all summary values to 0
+                document.getElementById('monthly-products').textContent = '0';
+                document.getElementById('monthly-filament').textContent = '0g';
+                document.getElementById('monthly-time').textContent = '0 jam';
+                document.getElementById('monthly-revenue').textContent = 'Rp0';
+                document.getElementById('monthly-cost').textContent = 'Rp0';
+                document.getElementById('monthly-profit').textContent = 'Rp0';
+                return;
+            }
+            
+            // Get selected month
+            const monthSelect = document.getElementById('month-select');
+            const selectedMonth = parseInt(monthSelect.value) || new Date().getMonth() + 1;
+            const currentYear = new Date().getFullYear();
+            
+            // Filter records for selected month
+            const monthJobs = printJobs.filter(job => {
+                const jobDate = new Date(job.date);
+                return jobDate.getMonth() + 1 === selectedMonth && jobDate.getFullYear() === currentYear;
+            });
+            
+            // Calculate totals
+            let totalProducts = 0;
+            let totalFilament = 0;
+            let totalTime = 0;
+            let totalRevenue = 0;
+            let totalCost = 0;
+            let totalProfit = 0;
+            
+            monthJobs.forEach(job => {
+                totalProducts++;
+                totalFilament += job.filamentUsage;
+                totalTime += job.printTime;
+                totalRevenue += job.sellingPrice;
+                totalCost += job.totalCost;
+                totalProfit += job.profit;
+                
+                // Add to table
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(job.date).toLocaleDateString('id-ID')}</td>
+                    <td>${job.productName}</td>
+                    <td>${getFilamentName(job.filamentType)}</td>
+                    <td>${job.filamentUsage}g</td>
+                    <td>${job.printTime} jam</td>
+                    <td>Rp${formatNumber(job.totalCost)}</td>
+                    <td>Rp${formatNumber(job.sellingPrice)}</td>
+                    <td>Rp${formatNumber(job.profit)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Function to load and display all products with delete buttons
+            function loadAllProducts() {
+                const products = JSON.parse(localStorage.getItem('products')) || {};
+                const productList = document.getElementById('product-list');
+                productList.innerHTML = '';
+
+                for (const [id, product] of Object.entries(products)) {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card';
+                    productCard.setAttribute('data-product', id);
+                    
+                    productCard.innerHTML = `
+                        <div class="product-image">${product.name}</div>
+                        <div class="product-details">
+                            <h4>${product.name}</h4>
+                            <div class="product-stats">
+                                <span>${product.filament}g filamen</span>
+                                <span>${product.time} jam</span>
+                            </div>
+                            <div class="product-price">Rp${formatNumber(product.price)}</div>
+                            <a href="#" class="quick-add">Tambah ke Catatan</a>
+                            <button class="delete-product" data-id="${id}">Hapus Produk</button>
+                        </div>
+                    `;
+                    
+                    productList.appendChild(productCard);
+                }
+
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-product').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const productId = this.getAttribute('data-id');
+                        deleteProduct(productId);
+                    });
+                });
+
+                // Re-add quick add event listeners
+                document.querySelectorAll('.quick-add').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const productCard = this.closest('.product-card');
+                        const productId = productCard.getAttribute('data-product');
+                        
+                        // Switch to daily tab
+                        document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                        
+                        document.querySelector('.tab-link[data-tab="daily"]').classList.add('active');
+                        document.getElementById('daily').classList.add('active');
+                        
+                        // Set product
+                        document.getElementById('product-select').value = productId;
+                        
+                        // Trigger change event
+                        const event = new Event('change');
+                        document.getElementById('product-select').dispatchEvent(event);
+                    });
+                });
+            }
+
+            // Function to delete a product
+            function deleteProduct(productId) {
+                if (confirm(`Apakah Anda yakin ingin menghapus produk ini?`)) {
+                    const products = JSON.parse(localStorage.getItem('products')) || {};
+                    delete products[productId];
+                    localStorage.setItem('products', JSON.stringify(products));
+                    loadAllProducts();
+                }
+            }
+
+            // Function to load and display all filaments with delete buttons
+            function loadAllFilaments() {
+                const filaments = JSON.parse(localStorage.getItem('filamentInventory')) || {};
+                const filamentList = document.getElementById('filament-list');
+                filamentList.innerHTML = '';
+
+                for (const [id, filament] of Object.entries(filaments)) {
+                    const remaining = filament.initial - filament.used;
+                    const status = remaining <= 0 ? 'Habis' : remaining < 100 ? 'Hampir Habis' : 'Tersedia';
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${filament.name}</td>
+                        <td>${formatNumber(filament.initial)}g</td>
+                        <td>${formatNumber(filament.used)}g</td>
+                        <td>${formatNumber(remaining)}g</td>
+                        <td>Rp${formatNumber(filament.price)}</td>
+                        <td>${status}</td>
+                        <td>
+                            <button class="update-inventory" data-id="${id}">Tambah Stok</button>
+                            <button class="delete-filament" data-id="${id}">Hapus</button>
+                        </td>
+                    `;
+                    
+                    filamentList.appendChild(row);
+                }
+
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-filament').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const filamentId = this.getAttribute('data-id');
+                        deleteFilament(filamentId);
+                    });
+                });
+
+                // Re-add update inventory event listeners
+                document.querySelectorAll('.update-inventory').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const filamentId = this.getAttribute('data-id');
+                        const filaments = JSON.parse(localStorage.getItem('filamentInventory'));
+                        const filament = filaments[filamentId];
+                        
+                        const newAmount = prompt(`Tambah stok untuk ${filament.name} (dalam gram):`, '0');
+                        if (newAmount === null) return;
+                        
+                        const amount = parseFloat(newAmount) || 0;
+                        if (amount <= 0) return;
+                        
+                        filaments[filamentId].initial += amount;
+                        localStorage.setItem('filamentInventory', JSON.stringify(filaments));
+                        loadAllFilaments();
+                    });
+                });
+            }
+
+            // Function to delete a filament
+            function deleteFilament(filamentId) {
+                if (confirm(`Apakah Anda yakin ingin menghapus filamen ini?`)) {
+                    const filaments = JSON.parse(localStorage.getItem('filamentInventory')) || {};
+                    delete filaments[filamentId];
+                    localStorage.setItem('filamentInventory', JSON.stringify(filaments));
+                    loadAllFilaments();
+                }
+            }
+            
+            // Update summary
+            document.getElementById('monthly-products').textContent = totalProducts;
+            document.getElementById('monthly-filament').textContent = `${formatNumber(totalFilament)}g`;
+            document.getElementById('monthly-time').textContent = `${formatNumber(totalTime)} jam`;
+            document.getElementById('monthly-revenue').textContent = `Rp${formatNumber(totalRevenue)}`;
+            document.getElementById('monthly-cost').textContent = `Rp${formatNumber(totalCost)}`;
+            document.getElementById('monthly-profit').textContent = `Rp${formatNumber(totalProfit)}`;
+            
+            // If no data for selected month, show message
+            if (monthJobs.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="8" style="text-align: center;">Belum ada data untuk bulan ini</td>';
+                tbody.appendChild(row);
+            }
+        }
+
+        // Helper function to get start of week (Monday)
+        function getWeekStartDate(date) {
             const d = new Date(date);
             const day = d.getDay();
             const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is Sunday
             return new Date(d.setDate(diff));
         }
 
-        // Fungsi utilitas untuk mendapatkan akhir minggu (Minggu)
-        function getEndOfWeek(date) {
-            const d = new Date(date);
-            const day = d.getDay();
-            const diff = d.getDate() + (day === 0 ? 0 : 7 - day); // adjust when day is Sunday
-            return new Date(d.setDate(diff));
+        // Helper function to get end of week (Sunday)
+        function getWeekEndDate(date) {
+            const start = getWeekStartDate(date);
+            const end = new Date(start);
+            end.setDate(start.getDate() + 6);
+            return end;
         }
 
-        // Fungsi utilitas untuk mendapatkan minggu ke berapa dalam bulan
-        function getWeekOfMonth(date) {
-            const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-            const firstWeekDay = firstDay === 0 ? 7 : firstDay; // Make Sunday 7
-            const dayOfMonth = date.getDate();
+        // Update month select to current month by default
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentMonth = new Date().getMonth() + 1;
+            document.getElementById('month-select').value = currentMonth;
             
-            return Math.ceil((dayOfMonth + firstWeekDay - 1) / 7);
-        }
+            // Add event listener for month select change
+            document.getElementById('month-select').addEventListener('change', loadMonthlyRecords);
+            
+            // Add event listener for week select change
+            document.getElementById('week-select').addEventListener('change', loadWeeklyRecords);
+        });
+
+        
     </script>
 </body>
 </html>
