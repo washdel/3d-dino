@@ -676,6 +676,82 @@
     </div>
 
     <script>
+            function resetAllData() {
+        // Clear localStorage
+        localStorage.setItem('printJobs', JSON.stringify([]));
+        localStorage.setItem('products', JSON.stringify({}));
+        localStorage.setItem('filamentInventory', JSON.stringify({}));
+
+        // Reset all input fields
+        const inputs = document.querySelectorAll('input:not([type="button"]):not([type="submit"])');
+        inputs.forEach(input => {
+            if (input.type === 'number') {
+                if (input.id === 'electricity-rate') {
+                    input.value = '1444.70';
+                } else if (input.id === 'printer-power') {
+                    input.value = '200';
+                } else {
+                    input.value = '0';
+                }
+            } else {
+                input.value = '';
+            }
+        });
+
+        // Reset all select elements
+        const selects = document.querySelectorAll('select');
+        selects.forEach(select => {
+            select.selectedIndex = 0;
+        });
+
+        // Reset all summary values
+        const values = document.querySelectorAll('.value');
+        values.forEach(value => {
+            if (value.id.includes('cost') || value.id.includes('revenue') || value.id.includes('profit')) {
+                value.textContent = 'Rp0';
+            } else if (value.id.includes('filament')) {
+                value.textContent = '0g';
+            } else if (value.id.includes('time')) {
+                value.textContent = '0 jam';
+            } else {
+                value.textContent = '0';
+            }
+        });
+
+        // Clear tables
+        const tables = ['daily-records', 'weekly-records', 'monthly-records', 'filament-inventory'];
+        tables.forEach(tableId => {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            if (tbody) {
+                tbody.innerHTML = '';
+            }
+        });
+
+        // Reset silica gel table to default state
+        document.querySelector('#silica-inventory tbody').innerHTML = `
+            <tr>
+                <td>Storage Box 1</td>
+                <td>${new Date().toLocaleDateString('id-ID')}</td>
+                <td>-</td>
+                <td>🔵 Aktif</td>
+                <td><button class="update-silica">Update</button></td>
+            </tr>
+        `;
+
+        // Reload page to apply all changes
+        location.reload();
+    }
+
+    // Add button to HTML
+    document.addEventListener('DOMContentLoaded', function() {
+        const resetButton = document.createElement('button');
+        resetButton.textContent = 'Reset Semua Data';
+        resetButton.style.backgroundColor = 'var(--warning)';
+        resetButton.style.marginTop = '2rem';
+        resetButton.onclick = resetAllData;
+        document.querySelector('.container').appendChild(resetButton);
+    });
+
         // Set current date
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date();
