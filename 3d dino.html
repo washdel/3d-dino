@@ -688,23 +688,14 @@
             }
             if (!localStorage.getItem('products')) {
                 const defaultProducts = {
-                    'figurine-s': { name: 'Figurine (Kecil)', filament: 30, time: 1.5, price: 45000 },
-                    'figurine-m': { name: 'Figurine (Sedang)', filament: 60, time: 3, price: 85000 },
-                    'figurine-l': { name: 'Figurine (Besar)', filament: 120, time: 6, price: 150000 },
-                    'spare-part': { name: 'Spare Part', filament: 15, time: 0.8, price: 25000 },
-                    'custom-model': { name: 'Model Kustom', filament: 90, time: 4.5, price: 120000 },
-                    'prototype': { name: 'Prototype', filament: 45, time: 2.5, price: 75000 }
                 };
+
                 localStorage.setItem('products', JSON.stringify(defaultProducts));
             }
             if (!localStorage.getItem('filamentInventory')) {
                 const defaultFilaments = {
-                    'pla-black': { name: 'PLA - Hitam', initial: 1000, used: 0, price: 200000 },
-                    'pla-white': { name: 'PLA - Putih', initial: 1000, used: 0, price: 200000 },
-                    'pla-red': { name: 'PLA - Merah', initial: 1000, used: 0, price: 200000 },
-                    'petg-clear': { name: 'PETG - Bening', initial: 1000, used: 0, price: 250000 },
-                    'tpu-black': { name: 'TPU - Hitam', initial: 500, used: 0, price: 300000 }
                 };
+                
                 localStorage.setItem('filamentInventory', JSON.stringify(defaultFilaments));
             }
             
