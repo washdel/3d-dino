@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Printing Business Tracker - Bambu Lab X1 Carbon</title>
+    <title>Sistem Pencatatan Keuangan 3D Printing - Bambu Lab X1 Carbon</title>
     <style>
         :root {
-            --primary: #3498db;
-            --secondary: #2ecc71;
-            --dark: #34495e;
-            --light: #ecf0f1;
-            --warning: #e74c3c;
-            --info: #f39c12;
+            --primary-color: #4e73df;
+            --secondary-color: #1cc88a;
+            --danger-color: #e74a3b;
+            --warning-color: #f6c23e;
+            --dark-color: #3a3b45;
+            --light-color: #f8f9fc;
         }
         
         * {
@@ -22,65 +22,77 @@
         }
         
         body {
-            background-color: #f5f7fa;
+            background-color: #f8f9fc;
             color: #333;
             line-height: 1.6;
         }
         
         .container {
-            width: 95%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 15px;
         }
         
         header {
-            background-color: var(--primary);
+            background-color: var(--primary-color);
             color: white;
-            padding: 1rem;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-size: 1.8rem;
             text-align: center;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 0.5rem;
         }
         
         nav {
-            background-color: var(--dark);
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 2rem;
+            background-color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
         
         .tabs {
             display: flex;
-            list-style: none;
+            justify-content: center;
+            gap: 1rem;
         }
         
-        .tabs li {
-            flex: 1;
+        .tab-btn {
+            background-color: var(--light-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
-        .tabs a {
-            display: block;
+        .tab-btn:hover {
+            background-color: #e8e8e8;
+        }
+        
+        .tab-btn.active {
+            background-color: var(--primary-color);
             color: white;
-            text-decoration: none;
-            text-align: center;
-            padding: 15px 0;
-            font-weight: bold;
-            transition: all 0.3s;
         }
         
-        .tabs a:hover, .tabs a.active {
-            background-color: var(--primary);
+        .content {
+            margin-top: 2rem;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
         }
         
         .tab-content {
             display: none;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
         }
         
         .tab-content.active {
@@ -94,596 +106,619 @@
         label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: bold;
-            color: var(--dark);
+            font-weight: 600;
         }
         
-        input, select, textarea {
+        input, select {
             width: 100%;
-            padding: 10px;
+            padding: 0.75rem;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 1rem;
         }
         
-        button {
-            background-color: var(--secondary);
-            color: white;
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .form-row > div {
+            flex: 1;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
             border: none;
-            padding: 12px 20px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 1rem;
-            font-weight: bold;
-            transition: all 0.3s;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
-        button:hover {
-            background-color: #27ae60;
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #375ad3;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #d32a1a;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
-            background: white;
         }
         
         th, td {
-            padding: 12px 15px;
+            padding: 0.75rem;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
         
         th {
-            background-color: var(--primary);
-            color: white;
+            background-color: #f6f9ff;
+            font-weight: 600;
         }
         
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        tr:hover {
+            background-color: #f8f9fc;
         }
         
-        .summary-card {
-            background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .summary-card h3 {
-            color: var(--primary);
-            margin-bottom: 1rem;
-            border-bottom: 2px solid var(--light);
-            padding-bottom: 0.5rem;
-        }
-        
-        .summary-data {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        
-        .data-item {
-            flex: 1;
-            min-width: 200px;
-            background: var(--light);
+        .summary {
+            margin-top: 2rem;
+            background-color: #f6f9ff;
             padding: 1rem;
             border-radius: 4px;
-            text-align: center;
+            border-left: 4px solid var(--primary-color);
         }
         
-        .data-item .value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary);
-            margin: 0.5rem 0;
+        .summary h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
         }
         
-        .data-item .label {
-            font-size: 0.9rem;
-            color: var(--dark);
-        }
-        
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-        
-        .product-card {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-        }
-        
-        .product-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .product-image {
-            height: 150px;
-            background-color: #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #777;
-            font-weight: bold;
-        }
-        
-        .product-details {
-            padding: 1rem;
-        }
-        
-        .product-details h4 {
-            margin-bottom: 0.5rem;
-            color: var(--dark);
-        }
-        
-        .product-stats {
+        .summary-item {
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-            color: #666;
+            margin-bottom: 0.5rem;
         }
         
-        .product-price {
-            font-weight: bold;
-            color: var(--primary);
-            font-size: 1.2rem;
-            margin: 0.5rem 0;
+        .info-box {
+            background-color: #f6f9ff;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
         }
         
-        .quick-add {
-            background: var(--secondary);
-            color: white;
-            display: block;
-            text-align: center;
-            padding: 0.7rem;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background 0.3s;
+        .info-box p {
+            margin-bottom: 0.5rem;
         }
         
-        .quick-add:hover {
-            background: #27ae60;
+        .btn-small {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
         }
         
-        @media (max-width: 768px) {
-            .tabs {
-                flex-direction: column;
-            }
-            
-            .data-item {
-                min-width: 100%;
-            }
-            
-            .product-grid {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            }
+        .report-options {
+            margin-bottom: 1rem;
+        }
+        
+        .products-library {
+            margin-top: 2rem;
+        }
+        
+        .product-item {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+        
+        .chart-container {
+            margin-top: 2rem;
+            height: 300px;
         }
     </style>
 </head>
 <body>
+    <header>
+        <div class="container">
+            <h1>Sistem Pencatatan Keuangan 3D Printing</h1>
+            <p class="subtitle">Bambu Lab X1 Carbon</p>
+        </div>
+    </header>
+    
+    <nav>
+        <div class="container">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="daily-tab">Pencatatan Harian</button>
+                <button class="tab-btn" data-tab="weekly-tab">Laporan Mingguan</button>
+                <button class="tab-btn" data-tab="monthly-tab">Laporan Bulanan</button>
+                <button class="tab-btn" data-tab="products-tab">Daftar Produk</button>
+                <button class="tab-btn" data-tab="settings-tab">Pengaturan</button>
+            </div>
+        </div>
+    </nav>
+    
     <div class="container">
-        <header>
-            <h1>3D Printing Business Tracker</h1>
-            <p>Bambu Lab X1 Carbon</p>
-        </header>
-        
-        <nav>
-            <ul class="tabs">
-                <li><a href="#" class="tab-link active" data-tab="daily">Pencatatan Harian</a></li>
-                <li><a href="#" class="tab-link" data-tab="weekly">Laporan Mingguan</a></li>
-                <li><a href="#" class="tab-link" data-tab="monthly">Laporan Bulanan</a></li>
-                <li><a href="#" class="tab-link" data-tab="products">Produk & Kalkulasi</a></li>
-                <li><a href="#" class="tab-link" data-tab="inventory">Inventaris</a></li>
-            </ul>
-        </nav>
-        
-        <!-- Daily Recording Tab -->
-        <div id="daily" class="tab-content active">
-            <h2>Pencatatan Harian</h2>
-            
-            <div class="form-group">
-                <label for="date">Tanggal:</label>
-                <input type="date" id="date" value="">
-            </div>
-            
-            <div class="form-group">
-                <label for="product-select">Pilih Produk:</label>
-                <select id="product-select">
-                    <option value="">-- Pilih Produk --</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="filament-type">Jenis Filamen:</label>
-                <select id="filament-type">
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="filament-usage">Penggunaan Filamen (gram):</label>
-                <input type="number" id="filament-usage" min="0" step="0.1">
-            </div>
-            
-            <div class="form-group">
-                <label for="print-time">Waktu Cetak (jam):</label>
-                <input type="number" id="print-time" min="0" step="0.1">
-            </div>
-            
-            <div class="form-group" id="calculation-results">
-                <div class="summary-card">
-                    <h3>Hasil Kalkulasi Otomatis</h3>
-                    <div class="summary-data">
-                        <div class="data-item">
-                            <div class="label">Biaya Filamen</div>
-                            <div class="value" id="filament-cost">Rp0</div>
+        <main class="content">
+            <!-- Tab Pencatatan Harian -->
+            <div class="tab-content active" id="daily-tab">
+                <h2>Pencatatan Transaksi Harian</h2>
+                <div class="info-box">
+                    <p>Tanggal: <span id="current-date"></span></p>
+                    <p>Total Transaksi Hari Ini: <span id="total-daily-transactions">0</span></p>
+                    <p>Total Pendapatan Hari Ini: <span id="total-daily-income">Rp 0</span></p>
+                </div>
+                
+                <form id="daily-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="transaction-date">Tanggal</label>
+                            <input type="date" id="transaction-date" required>
                         </div>
-                        <div class="data-item">
-                            <div class="label">Biaya Listrik</div>
-                            <div class="value" id="electricity-cost">Rp0</div>
-                        </div>
-                        <div class="data-item">
-                            <div class="label">Total Biaya</div>
-                            <div class="value" id="total-cost">Rp0</div>
+                        <div class="form-group">
+                            <label for="customer-name">Nama Pelanggan</label>
+                            <input type="text" id="customer-name" placeholder="Nama Pelanggan" required>
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="customer-name">Nama Pelanggan:</label>
-                <input type="text" id="customer-name">
-            </div>
-            
-            <div class="form-group">
-                <label for="selling-price">Harga Jual:</label>
-                <input type="number" id="selling-price" min="0">
-            </div>
-            
-            <div class="form-group">
-                <label for="notes">Catatan:</label>
-                <textarea id="notes" rows="3"></textarea>
-            </div>
-            
-            <button id="save-daily" type="button">Simpan Catatan</button>
-            
-            <h3 style="margin-top: 2rem;">Catatan Hari Ini</h3>
-            <table id="daily-records">
-                <thead>
-                    <tr>
-                        <th>Produk</th>
-                        <th>Filamen</th>
-                        <th>Berat (g)</th>
-                        <th>Waktu (jam)</th>
-                        <th>Biaya</th>
-                        <th>Harga Jual</th>
-                        <th>Profit</th>
-                        <th>Pelanggan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Data will be populated here -->
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- Weekly Report Tab -->
-        <div id="weekly" class="tab-content">
-            <h2>Laporan Mingguan</h2>
-            
-            <div class="form-group">
-                <label for="week-select">Pilih Minggu:</label>
-                <select id="week-select">
-                    <option value="week-1">Minggu 1</option>
-                    <option value="week-2">Minggu 2</option>
-                    <option value="week-3">Minggu 3</option>
-                    <option value="week-4">Minggu 4</option>
-                </select>
-            </div>
-            
-            <div class="summary-card">
-                <h3>Ringkasan Mingguan</h3>
-                <div class="summary-data">
-                    <div class="data-item">
-                        <div class="label">Total Produk</div>
-                        <div class="value" id="weekly-products">-</div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="product-select">Produk</label>
+                            <select id="product-select" required>
+                                <option value="">-- Pilih Produk --</option>
+                                <option value="custom">Produk Kustom</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-quantity">Jumlah</label>
+                            <input type="number" id="product-quantity" min="1" value="1" required>
+                        </div>
                     </div>
-                    <div class="data-item">
-                        <div class="label">Penggunaan Filamen</div>
-                        <div class="value" id="weekly-filament">-</div>
+                    
+                    <div id="custom-product-fields" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="custom-product-name">Nama Produk Kustom</label>
+                                <input type="text" id="custom-product-name" placeholder="Nama Produk">
+                            </div>
+                            <div class="form-group">
+                                <label for="custom-product-weight">Berat Filamen (gram)</label>
+                                <input type="number" id="custom-product-weight" min="1" placeholder="Berat dalam gram">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="custom-product-time">Waktu Cetak (jam)</label>
+                                <input type="number" id="custom-product-time" min="0.1" step="0.1" placeholder="Waktu cetak dalam jam">
+                            </div>
+                            <div class="form-group">
+                                <label for="custom-product-price">Harga (Rp)</label>
+                                <input type="number" id="custom-product-price" min="1000" step="1000" placeholder="Harga dalam Rupiah">
+                            </div>
+                        </div>
                     </div>
-                    <div class="data-item">
-                        <div class="label">Total Waktu Cetak</div>
-                        <div class="value" id="weekly-time">-</div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="payment-status">Status Pembayaran</label>
+                            <select id="payment-status" required>
+                                <option value="Lunas">Lunas</option>
+                                <option value="DP">DP (Uang Muka)</option>
+                                <option value="Belum">Belum Bayar</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="dp-amount-field" style="display: none;">
+                            <label for="dp-amount">Jumlah DP (Rp)</label>
+                            <input type="number" id="dp-amount" min="1000" step="1000" placeholder="Jumlah DP dalam Rupiah">
+                        </div>
                     </div>
-                    <div class="data-item">
-                        <div class="label">Total Pendapatan</div>
-                        <div class="value" id="weekly-revenue">-</div>
+                    
+                    <div class="info-box" id="calculation-result" style="display: none;">
+                        <h3>Informasi Kalkulasi</h3>
+                        <p>Berat Filamen: <span id="calc-filament-weight">0</span> gram</p>
+                        <p>Waktu Cetak: <span id="calc-print-time">0</span> jam</p>
+                        <p>Biaya Filamen: Rp <span id="calc-filament-cost">0</span></p>
+                        <p>Biaya Listrik: Rp <span id="calc-electricity-cost">0</span></p>
+                        <p>Total Biaya Produksi: Rp <span id="calc-total-cost">0</span></p>
+                        <p>Harga Jual: Rp <span id="calc-selling-price">0</span></p>
+                        <p>Margin Keuntungan: Rp <span id="calc-profit-margin">0</span> (<span id="calc-profit-percentage">0</span>%)</p>
                     </div>
-                    <div class="data-item">
-                        <div class="label">Total Biaya</div>
-                        <div class="value" id="weekly-cost">-</div>
-                    </div>
-                    <div class="data-item">
-                        <div class="label">Profit</div>
-                        <div class="value" id="weekly-profit">-</div>
-                    </div>
-                </div>
-            </div>
-            
-            <h3>Detail Penjualan Mingguan</h3>
-            <table id="weekly-records">
-                <thead>
-                    <tr>
-                        <th>Hari</th>
-                        <th>Produk</th>
-                        <th>Filamen</th>
-                        <th>Berat (g)</th>
-                        <th>Waktu (jam)</th>
-                        <th>Biaya</th>
-                        <th>Harga Jual</th>
-                        <th>Profit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Data will be populated here -->
-                    <tr>
-                        <td colspan="8" style="text-align: center;">Belum ada data</td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <div class="summary-card">
-                <h3>Produk Terpopuler</h3>
-                <div id="popular-products-chart" style="height: 300px; background: #eee; display: flex; align-items: center; justify-content: center;">
-                    Belum ada data
-                </div>
-            </div>
-        </div>
-        
-        <!-- Monthly Report Tab -->
-        <div id="monthly" class="tab-content">
-            <h2>Laporan Bulanan</h2>
-            
-            <div class="form-group">
-                <label for="month-select">Pilih Bulan:</label>
-                <select id="month-select">
-                    <option value="1">Januari</option>
-                    <option value="2">Februari</option>
-                    <option value="3">Maret</option>
-                    <option value="4">April</option>
-                    <option value="5">Mei</option>
-                    <option value="6">Juni</option>
-                    <option value="7">Juli</option>
-                    <option value="8">Agustus</option>
-                    <option value="9">September</option>
-                    <option value="10">Oktober</option>
-                    <option value="11">November</option>
-                    <option value="12">Desember</option>
-                </select>
-            </div>
-            
-            <div class="summary-card">
-                <h3>Ringkasan Bulanan</h3>
-                <div class="summary-data">
-                    <div class="data-item">
-                        <div class="label">Total Produk</div>
-                        <div class="value" id="monthly-products">-</div>
-                    </div>
-                    <div class="data-item">
-                        <div class="label">Penggunaan Filamen</div>
-                        <div class="value" id="monthly-filament">-</div>
-                    </div>
-                    <div class="data-item">
-                        <div class="label">Total Waktu Cetak</div>
-                        <div class="value" id="monthly-time">-</div>
-                    </div>
-                    <div class="data-item">
-                        <div class="label">Total Pendapatan</div>
-                        <div class="value" id="monthly-revenue">-</div>
-                    </div>
-                    <div class="data-item">
-                        <div class="label">Total Biaya</div>
-                        <div class="value" id="monthly-cost">-</div>
-                    </div>
-                    <div class="data-item">
-                        <div class="label">Profit</div>
-                        <div class="value" id="monthly-profit">-</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="summary-card">
-                <h3>Tren Mingguan dalam Bulan</h3>
-                <div id="weekly-trend-chart" style="height: 300px; background: #eee; display: flex; align-items: center; justify-content: center;">
-                    Belum ada data
-                </div>
-            </div>
-            
-            <div class="summary-card">
-                <h3>Distribusi Penggunaan Filamen</h3>
-                <div id="filament-distribution-chart" style="height: 300px; background: #eee; display: flex; align-items: center; justify-content: center;">
-                    Belum ada data
-                </div>
-            </div>
-            
-            <h3>Detail Penjualan Bulanan</h3>
-            <table id="monthly-records">
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Produk</th>
-                        <th>Filamen</th>
-                        <th>Berat (g)</th>
-                        <th>Waktu (jam)</th>
-                        <th>Biaya</th>
-                        <th>Harga Jual</th>
-                        <th>Profit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Data will be populated here -->
-                    <tr>
-                        <td colspan="8" style="text-align: center;">Belum ada data</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-           <!-- Products & Calculations Tab -->
-           <div id="products" class="tab-content">
-            <h2>Produk & Kalkulasi Otomatis</h2>
-            
-            <div class="form-group">
-                <label for="electricity-rate">Harga Listrik per kWh (Rp):</label>
-                <input type="number" id="electricity-rate" value="1444.70">
-                <p><small>Default: Rp1.444,70 (tarif dasar listrik rumah tangga R1/900VA)</small></p>
-            </div>
-            
-            <div class="form-group">
-                <label for="printer-power">Daya Printer saat Cetak (Watt):</label>
-                <input type="number" id="printer-power" value="200">
-                <p><small>Default: 200W untuk Bambu Lab X1 Carbon</small></p>
-            </div>
-            
-            <h3>Daftar Produk Preset</h3>
-            <p>Klik produk untuk melihat detail dan menambahkannya ke catatan harian</p>
-            
-            <div class="product-grid">
-                <!-- Product cards will be generated here -->
-                <div style="text-align: center; grid-column: 1/-1; padding: 2rem;">
-                    Belum ada produk preset
-                </div>
-            </div>
-            
-            <h3 style="margin-top: 2rem;">Tambah/Edit Produk Preset</h3>
-            <div class="form-group">
-                <label for="new-product-name">Nama Produk:</label>
-                <input type="text" id="new-product-name">
-            </div>
-            
-            <div class="form-group">
-                <label for="new-product-filament">Penggunaan Filamen (gram):</label>
-                <input type="number" id="new-product-filament" min="0" step="0.1">
-            </div>
-            
-            <div class="form-group">
-                <label for="new-product-time">Waktu Cetak (jam):</label>
-                <input type="number" id="new-product-time" min="0" step="0.1">
-            </div>
-            
-            <div class="form-group">
-                <label for="new-product-price">Harga Jual (Rp):</label>
-                <input type="number" id="new-product-price" min="0">
-            </div>
-            
-            <button id="save-product" type="button">Simpan Produk</button>
-        </div>
-        
-        <!-- Inventory Tab -->
-        <div id="inventory" class="tab-content">
-            <h2>Inventaris Bahan</h2>
-            
-            <div class="summary-card">
-                <h3>Filamen</h3>
-                <table id="filament-inventory">
+                    
+                    <button type="submit" class="btn btn-primary">Simpan Transaksi</button>
+                </form>
+                
+                <h3 style="margin-top: 2rem;">Daftar Transaksi Hari Ini</h3>
+                <table id="daily-transactions">
                     <thead>
                         <tr>
-                            <th>Jenis & Warna</th>
-                            <th>Stok Awal (g)</th>
-                            <th>Terpakai (g)</th>
-                            <th>Sisa (g)</th>
-                            <th>Harga per kg</th>
+                            <th>Tanggal</th>
+                            <th>Pelanggan</th>
+                            <th>Produk</th>
+                            <th>Jumlah</th>
+                            <th>Berat (g)</th>
+                            <th>Waktu (jam)</th>
+                            <th>Harga (Rp)</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td colspan="7" style="text-align: center;">Belum ada data filamen</td>
-                        </tr>
+                        <!-- Data akan diisi melalui JavaScript -->
                     </tbody>
                 </table>
+                
+                <div class="summary">
+                    <h3>Ringkasan Harian</h3>
+                    <div class="summary-item">
+                        <span>Total Transaksi:</span>
+                        <span id="summary-daily-transactions">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Pendapatan:</span>
+                        <span id="summary-daily-income">Rp 0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Biaya Produksi:</span>
+                        <span id="summary-daily-costs">Rp 0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Keuntungan:</span>
+                        <span id="summary-daily-profit">Rp 0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Filamen Terpakai:</span>
+                        <span id="summary-daily-filament">0 gram</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Waktu Cetak:</span>
+                        <span id="summary-daily-print-time">0 jam</span>
+                    </div>
+                </div>
             </div>
             
-            <div class="form-group">
-                <label for="add-filament-type">Tambah Jenis Filamen Baru:</label>
-                <input type="text" id="add-filament-type" placeholder="Jenis & Warna">
-            </div>
-            
-            <div class="form-group">
-                <label for="add-filament-amount">Jumlah (gram):</label>
-                <input type="number" id="add-filament-amount" min="0">
-            </div>
-            
-            <div class="form-group">
-                <label for="add-filament-price">Harga per kg (Rp):</label>
-                <input type="number" id="add-filament-price" min="0">
-            </div>
-            
-            <button id="add-filament" type="button">Tambah Filamen</button>
-            
-            <div class="summary-card" style="margin-top: 2rem;">
-                <h3>Silica Gel</h3>
-                <table id="silica-inventory">
+            <!-- Tab Laporan Mingguan -->
+            <div class="tab-content" id="weekly-tab">
+                <h2>Laporan Mingguan</h2>
+                <div class="report-options">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="weekly-start-date">Tanggal Mulai</label>
+                            <input type="date" id="weekly-start-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="weekly-end-date">Tanggal Akhir</label>
+                            <input type="date" id="weekly-end-date">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button id="generate-weekly-report" class="btn btn-primary">Tampilkan Laporan</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <p>Periode: <span id="weekly-period">-</span></p>
+                    <p>Total Transaksi: <span id="weekly-total-transactions">0</span></p>
+                    <p>Total Pendapatan: <span id="weekly-total-income">Rp 0</span></p>
+                </div>
+                
+                <h3>Transaksi Per Hari</h3>
+                <table id="weekly-summary-table">
                     <thead>
                         <tr>
-                            <th>Lokasi</th>
-                            <th>Tanggal Pakai</th>
-                            <th>Tanggal Recharge</th>
-                            <th>Status</th>
+                            <th>Tanggal</th>
+                            <th>Jumlah Transaksi</th>
+                            <th>Total Pendapatan</th>
+                            <th>Total Biaya</th>
+                            <th>Keuntungan</th>
+                            <th>Filamen (g)</th>
+                            <th>Waktu Cetak (jam)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data akan diisi melalui JavaScript -->
+                    </tbody>
+                </table>
+                
+                <div class="chart-container">
+                    <canvas id="weekly-chart"></canvas>
+                </div>
+                
+                <div class="summary">
+                    <h3>Ringkasan Mingguan</h3>
+                    <div class="summary-item">
+                        <span>Total Transaksi:</span>
+                        <span id="summary-weekly-transactions">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Pendapatan:</span>
+                        <span id="summary-weekly-income">Rp 0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Biaya Produksi:</span>
+                        <span id="summary-weekly-costs">Rp 0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Keuntungan:</span>
+                        <span id="summary-weekly-profit">Rp 0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Filamen Terpakai:</span>
+                        <span id="summary-weekly-filament">0 gram</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Waktu Cetak:</span>
+                        <span id="summary-weekly-print-time">0 jam</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Rata-rata Transaksi per Hari:</span>
+                        <span id="summary-weekly-avg-transactions">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Rata-rata Pendapatan per Hari:</span>
+                        <span id="summary-weekly-avg-income">Rp 0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Laporan Bulanan -->
+            <div class="tab-content" id="monthly-tab">
+                <h2>Laporan Bulanan</h2>
+                <div class="report-options">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="month-select">Bulan</label>
+                            <select id="month-select">
+                                <option value="0">Januari</option>
+                                <option value="1">Februari</option>
+                                <option value="2">Maret</option>
+                                <option value="3">April</option>
+                                <option value="4">Mei</option>
+                                <option value="5">Juni</option>
+                                <option value="6">Juli</option>
+                                <option value="7">Agustus</option>
+                                <option value="8">September</option>
+                                <option value="9">Oktober</option>
+                                <option value="10">November</option>
+                                <option value="11">Desember</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="year-select">Tahun</label>
+                            <input type="number" id="year-select" min="2023" max="2050">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button id="generate-monthly-report" class="btn btn-primary">Tampilkan Laporan</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <p>Periode: <span id="monthly-period">-</span></p>
+                    <p>Total Transaksi: <span id="monthly-total-transactions">0</span></p>
+                    <p>Total Pendapatan: <span id="monthly-total-income">Rp 0</span></p>
+                </div>
+                
+                <h3>Transaksi Per Minggu</h3>
+                <table id="monthly-summary-table">
+                    <thead>
+                        <tr>
+                            <th>Minggu</th>
+                            <th>Jumlah Transaksi</th>
+                            <th>Total Pendapatan</th>
+                            <th>Total Biaya</th>
+                            <th>Keuntungan</th>
+                            <th>Filamen (g)</th>
+                            <th>Waktu Cetak (jam)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data akan diisi melalui JavaScript -->
+                    </tbody>
+                </table>
+                
+                <div class="chart-container">
+                    <canvas id="monthly-chart"></canvas>
+                </div>
+                
+                <h3>Produk Terlaris</h3>
+                <table id="top-products-table">
+                    <thead>
+                        <tr>
+                            <th>Produk</th>
+                            <th>Jumlah Terjual</th>
+                            <th>Total Pendapatan</th>
+                            <th>Total Filamen (g)</th>
+                            <th>Total Waktu (jam)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data akan diisi melalui JavaScript -->
+                    </tbody>
+                </table>
+                
+                <div class="summary">
+                    <h3>Ringkasan Bulanan</h3>
+                    <div class="summary-item">
+                        <span>Total Transaksi:</span>
+                        <span id="summary-monthly-transactions">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Pendapatan:</span>
+                        <span id="summary-monthly-income">Rp 0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Biaya Produksi:</span>
+                        <span id="summary-monthly-costs">Rp 0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Keuntungan:</span>
+                        <span id="summary-monthly-profit">Rp 0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Filamen Terpakai:</span>
+                        <span id="summary-monthly-filament">0 gram</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Waktu Cetak:</span>
+                        <span id="summary-monthly-print-time">0 jam</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Rata-rata Transaksi per Hari:</span>
+                        <span id="summary-monthly-avg-transactions">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Rata-rata Pendapatan per Hari:</span>
+                        <span id="summary-monthly-avg-income">Rp 0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Daftar Produk -->
+            <div class="tab-content" id="products-tab">
+                <h2>Daftar Produk</h2>
+                <p>Tambahkan daftar produk yang sering Anda cetak beserta informasi teknis untuk kalkulasi otomatis.</p>
+                
+                <form id="product-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="product-name">Nama Produk</label>
+                            <input type="text" id="product-name" placeholder="Nama Produk" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-weight">Berat Filamen (gram)</label>
+                            <input type="number" id="product-weight" min="1" placeholder="Berat dalam gram" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="product-time">Waktu Cetak (jam)</label>
+                            <input type="number" id="product-time" min="0.1" step="0.1" placeholder="Waktu cetak dalam jam" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-price">Harga (Rp)</label>
+                            <input type="number" id="product-price" min="1000" step="1000" placeholder="Harga dalam Rupiah" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="product-category">Kategori</label>
+                            <input type="text" id="product-category" placeholder="Kategori Produk">
+                        </div>
+                        <div class="form-group">
+                            <label for="product-description">Deskripsi (opsional)</label>
+                            <input type="text" id="product-description" placeholder="Deskripsi singkat produk">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Tambah Produk</button>
+                </form>
+                
+                <h3 style="margin-top: 2rem;">Daftar Produk Tersimpan</h3>
+                <table id="products-table">
+                    <thead>
+                        <tr>
+                            <th>Nama Produk</th>
+                            <th>Kategori</th>
+                            <th>Berat (g)</th>
+                            <th>Waktu (jam)</th>
+                            <th>Harga (Rp)</th>
+                            <th>Biaya Produksi (Rp)</th>
+                            <th>Margin (%)</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Storage Box 1</td>
-                            <td>29/04/2025</td>
-                            <td>-</td>
-                            <td>🔵 Aktif</td>
-                            <td><button class="update-silica">Update</button></td>
-                        </tr>
-                        <tr>
-                            <td>Storage Box 2</td>
-                            <td>29/04/2025</td>
-                            <td>-</td>
-                            <td>🔵 Aktif</td>
-                            <td><button class="update-silica">Update</button></td>
-                        </tr>
-                        <tr>
-                            <td>Printer Enclosure</td>
-                            <td>29/04/2025</td>
-                            <td>-</td>
-                            <td>🔵 Aktif</td>
-                            <td><button class="update-silica">Update</button></td>
-                        </tr>
-                        <tr>
-                            <td>Filament Box</td>
-                            <td>29/04/2025</td>
-                            <td>-</td>
-                            <td>🔵 Aktif</td>
-                            <td><button class="update-silica">Update</button></td>
-                        </tr>
+                        <!-- Data akan diisi melalui JavaScript -->
                     </tbody>
                 </table>
             </div>
             
-            <div class="form-group" style="margin-top: 2rem;">
-                <label for="add-silica-location">Tambah Lokasi Silica Gel:</label>
-                <input type="text" id="add-silica-location" placeholder="Lokasi Baru">
+            <!-- Tab Pengaturan -->
+            <div class="tab-content" id="settings-tab">
+                <h2>Pengaturan</h2>
+                <p>Konfigurasi parameter biaya untuk kalkulasi yang akurat.</p>
+                
+                <form id="settings-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="filament-cost">Harga Filamen per kg (Rp)</label>
+                            <input type="number" id="filament-cost" min="1000" step="1000" placeholder="Harga per kg" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="electricity-cost">Biaya Listrik per kWh (Rp)</label>
+                            <input type="number" id="electricity-cost" min="100" step="100" placeholder="Biaya per kWh" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="printer-wattage">Daya Printer (Watt)</label>
+                            <input type="number" id="printer-wattage" min="1" placeholder="Daya dalam Watt" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="silica-cost">Biaya Silica Gel per print (Rp)</label>
+                            <input type="number" id="silica-cost" min="0" step="100" placeholder="Biaya per print" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="other-costs">Biaya Lain per print (Rp)</label>
+                            <input type="number" id="other-costs" min="0" step="100" placeholder="Biaya lain per print" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profit-margin">Target Margin Keuntungan (%)</label>
+                            <input type="number" id="profit-margin" min="0" max="1000" placeholder="Target margin dalam %" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
+                </form>
+                
+                <div class="form-group" style="margin-top: 2rem;">
+                    <h3>Backup Data</h3>
+                    <div class="form-row">
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button id="export-data" class="btn btn-primary">Export Data (JSON)</button>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button id="import-data" class="btn btn-primary">Import Data</button>
+                            <input type="file" id="import-file" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-top: 2rem;">
+                    <h3>Reset Data</h3>
+                    <div class="form-row">
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button id="reset-transactions" class="btn btn-danger">Reset Transaksi</button>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button id="reset-products" class="btn btn-danger">Reset Produk</button>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button id="reset-all" class="btn btn-danger">Reset Semua Data</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <button id="add-silica" type="button">Tambah Silica Gel</button>
-        </div>
-        
+        </main>
     </div>
+
 
     <script>
         // Format currency to Indonesian Rupiah format
