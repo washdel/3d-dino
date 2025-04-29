@@ -686,175 +686,261 @@
     </div>
 
     <script>
-// Load weekly records
-    function loadWeeklyRecords() {
-        const printJobs = JSON.parse(localStorage.getItem('printJobs'));
-        const tbody = document.querySelector('#weekly-records tbody');
-        tbody.innerHTML = '';
-        
-        // Get current date
-        const now = new Date();
-        
-        // Calculate the start of the current week (Sunday)
-        const startOfWeek = new Date(now);
-        startOfWeek.setDate(now.getDate() - now.getDay());
-        startOfWeek.setHours(0, 0, 0, 0);
-        
-        // Calculate the end of the current week (Saturday)
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 6);
-        endOfWeek.setHours(23, 59, 59, 999);
-        
-        // Filter records for the current week
-        const weeklyJobs = printJobs.filter(job => {
-            const jobDate = new Date(job.date);
-            return jobDate >= startOfWeek && jobDate <= endOfWeek;
-        });
-        
-        if (weeklyJobs.length === 0) {
-            const row = document.createElement('tr');
-            row.innerHTML = '<td colspan="8" style="text-align: center;">Belum ada data untuk minggu ini</td>';
-            tbody.appendChild(row);
-            return;
+        // Format currency to Indonesian Rupiah format
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('id-ID').format(Math.round(value));
         }
-        
-        weeklyJobs.forEach(job => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${new Date(job.date).toLocaleDateString('id-ID')}</td>
-                <td>${job.productName}</td>
-                <td>${getFilamentName(job.filamentType)}</td>
-                <td>${job.filamentUsage}g</td>
-                <td>${job.printTime} jam</td>
-                <td>Rp${formatNumber(job.totalCost)}</td>
-                <td>Rp${formatNumber(job.sellingPrice)}</td>
-                <td>Rp${formatNumber(job.profit)}</td>
-            `;
-            tbody.appendChild(row);
-        });
-        
-        // Add weekly summary row
-        const totalCost = weeklyJobs.reduce((sum, job) => sum + job.totalCost, 0);
-        const totalRevenue = weeklyJobs.reduce((sum, job) => sum + job.sellingPrice, 0);
-        const totalProfit = weeklyJobs.reduce((sum, job) => sum + job.profit, 0);
-        const totalFilament = weeklyJobs.reduce((sum, job) => sum + job.filamentUsage, 0);
-        const totalTime = weeklyJobs.reduce((sum, job) => sum + job.printTime, 0);
-        
-        // Add summary row
-        const summaryRow = document.createElement('tr');
-        summaryRow.className = 'summary-row';
-        summaryRow.innerHTML = `
-            <td colspan="3"><strong>Total Minggu Ini</strong></td>
-            <td><strong>${totalFilament.toFixed(1)}g</strong></td>
-            <td><strong>${totalTime.toFixed(1)} jam</strong></td>
-            <td><strong>Rp${formatNumber(totalCost)}</strong></td>
-            <td><strong>Rp${formatNumber(totalRevenue)}</strong></td>
-            <td><strong>Rp${formatNumber(totalProfit)}</strong></td>
-        `;
-        tbody.appendChild(summaryRow);
-    }
 
-    // Load monthly records
-    function loadMonthlyRecords() {
-        const printJobs = JSON.parse(localStorage.getItem('printJobs'));
-        const tbody = document.querySelector('#monthly-records tbody');
-        tbody.innerHTML = '';
-        
-        // Get current date
-        const now = new Date();
-        
-        // Calculate the start of the current month
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        
-        // Calculate the end of the current month
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-        
-        // Filter records for the current month
-        const monthlyJobs = printJobs.filter(job => {
-            const jobDate = new Date(job.date);
-            return jobDate >= startOfMonth && jobDate <= endOfMonth;
-        });
-        
-        if (monthlyJobs.length === 0) {
-            const row = document.createElement('tr');
-            row.innerHTML = '<td colspan="8" style="text-align: center;">Belum ada data untuk bulan ini</td>';
-            tbody.appendChild(row);
-            return;
+        // Format date for display (e.g., "29 Apr 2025")
+        function formatDate(date) {
+            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+            return date.toLocaleDateString('id-ID', options);
         }
-        
-        // Group jobs by day
-        const jobsByDay = {};
-        monthlyJobs.forEach(job => {
-            const day = job.date;
-            if (!jobsByDay[day]) {
-                jobsByDay[day] = [];
+
+        // Format date for input value (YYYY-MM-DD)
+        function formatDateValue(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Get ISO week number from date
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        // Delete a product
+        function deleteProduct(id) {
+            if (confirm('Anda yakin ingin menghapus produk ini?')) {
+                // Find index of product
+                const index = products.findIndex(p => p.id === id);
+                if (index !== -1) {
+                    // Remove product
+                    products.splice(index, 1);
+                    // Save data
+                    saveData();
+                    // Update UI
+                    updateProductsTable();
+                    updateProductSelect();
+                    alert('Produk berhasil dihapus!');
+                }
             }
-            jobsByDay[day].push(job);
-        });
-        
-        // Add rows for each day with jobs
-        Object.keys(jobsByDay).sort().forEach(day => {
-            const jobs = jobsByDay[day];
-            const dayDate = new Date(day);
+        }
+
+        // Delete a transaction
+        function deleteTransaction(id) {
+            if (confirm('Anda yakin ingin menghapus transaksi ini?')) {
+                // Find index of transaction
+                const index = transactions.findIndex(t => t.id === id);
+                if (index !== -1) {
+                    // Remove transaction
+                    transactions.splice(index, 1);
+                    // Save data
+                    saveData();
+                    // Update UI
+                    updateDailyTransactionsTable();
+                    updateSummaries();
+                    alert('Transaksi berhasil dihapus!');
+                }
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('3dprint_settings', JSON.stringify(settings));
+            localStorage.setItem('3dprint_products', JSON.stringify(products));
+            localStorage.setItem('3dprint_transactions', JSON.stringify(transactions));
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            // Load settings
+            const savedSettings = localStorage.getItem('3dprint_settings');
+            if (savedSettings) {
+                settings = JSON.parse(savedSettings);
+            }
             
-            // Calculate daily totals
-            const dailyCost = jobs.reduce((sum, job) => sum + job.totalCost, 0);
-            const dailyRevenue = jobs.reduce((sum, job) => sum + job.sellingPrice, 0);
-            const dailyProfit = jobs.reduce((sum, job) => sum + job.profit, 0);
-            const dailyFilament = jobs.reduce((sum, job) => sum + job.filamentUsage, 0);
-            const dailyTime = jobs.reduce((sum, job) => sum + job.printTime, 0);
+            // Load products
+            const savedProducts = localStorage.getItem('3dprint_products');
+            if (savedProducts) {
+                products = JSON.parse(savedProducts);
+            }
             
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${dayDate.toLocaleDateString('id-ID')}</td>
-                <td>${jobs.length}</td>
-                <td>${dailyFilament.toFixed(1)}g</td>
-                <td>${dailyTime.toFixed(1)} jam</td>
-                <td>Rp${formatNumber(dailyCost)}</td>
-                <td>Rp${formatNumber(dailyRevenue)}</td>
-                <td>Rp${formatNumber(dailyProfit)}</td>
-            `;
-            tbody.appendChild(row);
-        });
-        
-        // Add monthly summary row
-        const totalCost = monthlyJobs.reduce((sum, job) => sum + job.totalCost, 0);
-        const totalRevenue = monthlyJobs.reduce((sum, job) => sum + job.sellingPrice, 0);
-        const totalProfit = monthlyJobs.reduce((sum, job) => sum + job.profit, 0);
-        const totalFilament = monthlyJobs.reduce((sum, job) => sum + job.filamentUsage, 0);
-        const totalTime = monthlyJobs.reduce((sum, job) => sum + job.printTime, 0);
-        
-        // Add summary row
-        const summaryRow = document.createElement('tr');
-        summaryRow.className = 'summary-row';
-        summaryRow.innerHTML = `
-            <td colspan="2"><strong>Total Bulan Ini</strong></td>
-            <td><strong>${totalFilament.toFixed(1)}g</strong></td>
-            <td><strong>${totalTime.toFixed(1)} jam</strong></td>
-            <td><strong>Rp${formatNumber(totalCost)}</strong></td>
-            <td><strong>Rp${formatNumber(totalRevenue)}</strong></td>
-            <td><strong>Rp${formatNumber(totalProfit)}</strong></td>
-        `;
-        tbody.appendChild(summaryRow);
-    }   
-
-        // Load weekly records
-        function loadWeeklyRecords() {
+            // Load transactions
+            const savedTransactions = localStorage.getItem('3dprint_transactions');
+            if (savedTransactions) {
+                transactions = JSON.parse(savedTransactions);
+            }
         }
 
-        // Load monthly records
-        function loadMonthlyRecords() {
+        // Export data to JSON file
+        function exportData() {
+            const data = {
+                settings: settings,
+                products: products,
+                transactions: transactions,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `3dprint_data_${formatDateValue(new Date())}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
-        // Helper function to get filament name from ID
-        function getFilamentName(filamentId) {
-            const filaments = JSON.parse(localStorage.getItem('filamentInventory'));
-            return filaments[filamentId] ? filaments[filamentId].name : filamentId;
+        // Import data from JSON file
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Validate data structure
+                    if (data.settings && data.products && data.transactions) {
+                        // Confirm import
+                        if (confirm('Data akan diimpor dan menggantikan data yang ada. Lanjutkan?')) {
+                            settings = data.settings;
+                            products = data.products;
+                            transactions = data.transactions;
+                            
+                            // Save to localStorage
+                            saveData();
+                            
+                            // Update UI
+                            updateProductsTable();
+                            updateProductSelect();
+                            updateDailyTransactionsTable();
+                            updateSummaries();
+                            loadSettingsToForm();
+                            
+                            alert('Data berhasil diimpor!');
+                        }
+                    } else {
+                        alert('Format file tidak valid!');
+                    }
+                } catch (error) {
+                    alert('Gagal memproses file! ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset file input
+            event.target.value = '';
         }
 
-        // Helper function to format numbers with thousand separators
-        function formatNumber(num) {
-            return Math.round(num).toLocaleString('id-ID');
+        // Reset transactions
+        function resetTransactions() {
+            if (confirm('Anda yakin ingin menghapus semua data transaksi? Tindakan ini tidak dapat dibatalkan!')) {
+                transactions = [];
+                saveData();
+                updateDailyTransactionsTable();
+                updateSummaries();
+                alert('Data transaksi berhasil dihapus!');
+            }
+        }
+
+        // Reset products
+        function resetProducts() {
+            if (confirm('Anda yakin ingin menghapus semua data produk? Tindakan ini tidak dapat dibatalkan!')) {
+                products = [];
+                saveData();
+                updateProductsTable();
+                updateProductSelect();
+                alert('Data produk berhasil dihapus!');
+            }
+        }
+
+        // Reset all data
+        function resetAllData() {
+            if (confirm('Anda yakin ingin menghapus SEMUA data aplikasi? Tindakan ini tidak dapat dibatalkan!')) {
+                settings = {
+                    filamentCost: 350000,
+                    electricityCost: 1500,
+                    printerWattage: 250,
+                    silicaCost: 2000,
+                    otherCosts: 5000,
+                    profitMargin: 50
+                };
+                products = [];
+                transactions = [];
+                
+                saveData();
+                
+                updateProductsTable();
+                updateProductSelect();
+                updateDailyTransactionsTable();
+                updateSummaries();
+                loadSettingsToForm();
+                
+                alert('Semua data berhasil direset ke pengaturan awal!');
+            }
+        }
+
+        // Load settings values to form
+        function loadSettingsToForm() {
+            document.getElementById('filament-cost').value = settings.filamentCost;
+            document.getElementById('electricity-cost').value = settings.electricityCost;
+            document.getElementById('printer-wattage').value = settings.printerWattage;
+            document.getElementById('silica-cost').value = settings.silicaCost;
+            document.getElementById('other-costs').value = settings.otherCosts;
+            document.getElementById('profit-margin').value = settings.profitMargin;
+        }
+
+        // Complete the updateSummaries function that was cut off
+        function updateSummaries() {
+            // Daily summary
+            const today = formatDateValue(new Date());
+            const todayTransactions = transactions.filter(tx => tx.date === today);
+            
+            const dailyTotal = todayTransactions.length;
+            const dailyIncome = todayTransactions.reduce((sum, tx) => sum + tx.totalPrice, 0);
+            const dailyCosts = todayTransactions.reduce((sum, tx) => sum + tx.totalCost, 0);
+            const dailyProfit = todayTransactions.reduce((sum, tx) => sum + tx.profitMargin, 0);
+            const dailyFilament = todayTransactions.reduce((sum, tx) => sum + tx.totalWeight, 0);
+            const dailyTime = todayTransactions.reduce((sum, tx) => sum + tx.totalTime, 0);
+            
+            document.getElementById('summary-daily-transactions').textContent = dailyTotal;
+            document.getElementById('summary-daily-income').textContent = 'Rp ' + formatCurrency(dailyIncome);
+            document.getElementById('summary-daily-costs').textContent = 'Rp ' + formatCurrency(dailyCosts);
+            document.getElementById('summary-daily-profit').textContent = 'Rp ' + formatCurrency(dailyProfit);
+            document.getElementById('summary-daily-filament').textContent = dailyFilament.toFixed(0) + ' gram';
+            document.getElementById('summary-daily-print-time').textContent = dailyTime.toFixed(1) + ' jam';
+            
+            // Total summary (all time)
+            const totalTransactions = transactions.length;
+            const totalIncome = transactions.reduce((sum, tx) => sum + tx.totalPrice, 0);
+            const totalCosts = transactions.reduce((sum, tx) => sum + tx.totalCost, 0);
+            const totalProfit = transactions.reduce((sum, tx) => sum + tx.profitMargin, 0);
+            const totalFilament = transactions.reduce((sum, tx) => sum + tx.totalWeight, 0);
+            const totalTime = transactions.reduce((sum, tx) => sum + tx.totalTime, 0);
+            
+            document.getElementById('summary-total-transactions').textContent = totalTransactions;
+            document.getElementById('summary-total-income').textContent = 'Rp ' + formatCurrency(totalIncome);
+            document.getElementById('summary-total-costs').textContent = 'Rp ' + formatCurrency(totalCosts);
+            document.getElementById('summary-total-profit').textContent = 'Rp ' + formatCurrency(totalProfit);
+            document.getElementById('summary-total-filament').textContent = totalFilament.toFixed(0) + ' gram';
+            document.getElementById('summary-total-print-time').textContent = totalTime.toFixed(1) + ' jam';
+            
+            // Calculate pending payments
+            const pendingTransactions = transactions.filter(tx => tx.paymentStatus === 'DP');
+            const pendingAmount = pendingTransactions.reduce(
+                (sum, tx) => sum + (tx.totalPrice - tx.dpAmount), 0
+            );
+            document.getElementById('summary-pending-payments').textContent = 'Rp ' + formatCurrency(pendingAmount);
         }
     </script>
 </body>
