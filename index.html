@@ -563,6 +563,83 @@
             <p>Klik produk untuk melihat detail dan menambahkannya ke catatan harian</p>
             
             <div class="product-grid">
+                <div class="product-card" data-product="figurine-s">
+                    <div class="product-image">Figurine (Kecil)</div>
+                    <div class="product-details">
+                        <h4>Figurine (Kecil)</h4>
+                        <div class="product-stats">
+                            <span>30g filamen</span>
+                            <span>1.5 jam</span>
+                        </div>
+                        <div class="product-price">Rp45,000</div>
+                        <a href="#" class="quick-add">Tambahkan ke Catatan</a>
+                    </div>
+                </div>
+                
+                <div class="product-card" data-product="figurine-m">
+                    <div class="product-image">Figurine (Sedang)</div>
+                    <div class="product-details">
+                        <h4>Figurine (Sedang)</h4>
+                        <div class="product-stats">
+                            <span>60g filamen</span>
+                            <span>3 jam</span>
+                        </div>
+                        <div class="product-price">Rp85,000</div>
+                        <a href="#" class="quick-add">Tambahkan ke Catatan</a>
+                    </div>
+                </div>
+                
+                <div class="product-card" data-product="figurine-l">
+                    <div class="product-image">Figurine (Besar)</div>
+                    <div class="product-details">
+                        <h4>Figurine (Besar)</h4>
+                        <div class="product-stats">
+                            <span>120g filamen</span>
+                            <span>6 jam</span>
+                        </div>
+                        <div class="product-price">Rp150,000</div>
+                        <a href="#" class="quick-add">Tambahkan ke Catatan</a>
+                    </div>
+                </div>
+                
+                <div class="product-card" data-product="spare-part">
+                    <div class="product-image">Spare Part</div>
+                    <div class="product-details">
+                        <h4>Spare Part</h4>
+                        <div class="product-stats">
+                            <span>15g filamen</span>
+                            <span>0.8 jam</span>
+                        </div>
+                        <div class="product-price">Rp25,000</div>
+                        <a href="#" class="quick-add">Tambahkan ke Catatan</a>
+                    </div>
+                </div>
+                
+                <div class="product-card" data-product="custom-model">
+                    <div class="product-image">Model Kustom</div>
+                    <div class="product-details">
+                        <h4>Model Kustom</h4>
+                        <div class="product-stats">
+                            <span>90g filamen</span>
+                            <span>4.5 jam</span>
+                        </div>
+                        <div class="product-price">Rp120,000</div>
+                        <a href="#" class="quick-add">Tambahkan ke Catatan</a>
+                    </div>
+                </div>
+                
+                <div class="product-card" data-product="prototype">
+                    <div class="product-image">Prototype</div>
+                    <div class="product-details">
+                        <h4>Prototype</h4>
+                        <div class="product-stats">
+                            <span>45g filamen</span>
+                            <span>2.5 jam</span>
+                        </div>
+                        <div class="product-price">Rp75,000</div>
+                        <a href="#" class="quick-add">Tambahkan ke Catatan</a>
+                    </div>
+                </div>
             </div>
             
             <h3 style="margin-top: 2rem;">Tambah/Edit Produk Preset</h3>
@@ -1379,51 +1456,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>PLA - Hitam</td>
-                            <td>1000</td>
-                            <td>0</td>
-                            <td>1000</td>
-                            <td>Rp200,000</td>
-                            <td>✅ Cukup</td>
-                            <td><button class="update-inventory">Update</button></td>
-                        </tr>
-                        <tr>
-                            <td>PLA - Putih</td>
-                            <td>1000</td>
-                            <td>0</td>
-                            <td>1000</td>
-                            <td>Rp200,000</td>
-                            <td>✅ Cukup</td>
-                            <td><button class="update-inventory">Update</button></td>
-                        </tr>
-                        <tr>
-                            <td>PLA - Merah</td>
-                            <td>1000</td>
-                            <td>0</td>
-                            <td>1000</td>
-                            <td>Rp200,000</td>
-                            <td>✅ Cukup</td>
-                            <td><button class="update-inventory">Update</button></td>
-                        </tr>
-                        <tr>
-                            <td>PETG - Bening</td>
-                            <td>1000</td>
-                            <td>0</td>
-                            <td>1000</td>
-                            <td>Rp250,000</td>
-                            <td>✅ Cukup</td>
-                            <td><button class="update-inventory">Update</button></td>
-                        </tr>
-                        <tr>
-                            <td>TPU - Hitam</td>
-                            <td>500</td>
-                            <td>0</td>
-                            <td>500</td>
-                            <td>Rp300,000</td>
-                            <td>✅ Cukup</td>
-                            <td><button class="update-inventory">Update</button></td>
-                        </tr>
+                       
                     </tbody>
                 </table>
             </div>
@@ -1513,22 +1546,11 @@
             }
             if (!localStorage.getItem('products')) {
                 const defaultProducts = {
-                    'figurine-s': { name: 'Figurine (Kecil)', filament: 30, time: 1.5, price: 45000 },
-                    'figurine-m': { name: 'Figurine (Sedang)', filament: 60, time: 3, price: 85000 },
-                    'figurine-l': { name: 'Figurine (Besar)', filament: 120, time: 6, price: 150000 },
-                    'spare-part': { name: 'Spare Part', filament: 15, time: 0.8, price: 25000 },
-                    'custom-model': { name: 'Model Kustom', filament: 90, time: 4.5, price: 120000 },
-                    'prototype': { name: 'Prototype', filament: 45, time: 2.5, price: 75000 }
                 };
                 localStorage.setItem('products', JSON.stringify(defaultProducts));
             }
             if (!localStorage.getItem('filamentInventory')) {
                 const defaultFilaments = {
-                    'pla-black': { name: 'PLA - Hitam', initial: 1000, used: 0, price: 200000 },
-                    'pla-white': { name: 'PLA - Putih', initial: 1000, used: 0, price: 200000 },
-                    'pla-red': { name: 'PLA - Merah', initial: 1000, used: 0, price: 200000 },
-                    'petg-clear': { name: 'PETG - Bening', initial: 1000, used: 0, price: 250000 },
-                    'tpu-black': { name: 'TPU - Hitam', initial: 500, used: 0, price: 300000 }
                 };
                 localStorage.setItem('filamentInventory', JSON.stringify(defaultFilaments));
             }
@@ -1896,26 +1918,10 @@
 
         // Load weekly records
         function loadWeeklyRecords() {
-            // Implementation will be added here
-            // For demo purposes, showing placeholder data
-            document.getElementById('weekly-products').textContent = '28';
-            document.getElementById('weekly-filament').textContent = '1,560g';
-            document.getElementById('weekly-time').textContent = '78 jam';
-            document.getElementById('weekly-revenue').textContent = 'Rp2,870,000';
-            document.getElementById('weekly-cost').textContent = 'Rp825,000';
-            document.getElementById('weekly-profit').textContent = 'Rp2,045,000';
         }
 
         // Load monthly records
         function loadMonthlyRecords() {
-            // Implementation will be added here
-            // For demo purposes, showing placeholder data
-            document.getElementById('monthly-products').textContent = '112';
-            document.getElementById('monthly-filament').textContent = '6,240g';
-            document.getElementById('monthly-time').textContent = '312 jam';
-            document.getElementById('monthly-revenue').textContent = 'Rp11,480,000';
-            document.getElementById('monthly-cost').textContent = 'Rp3,300,000';
-            document.getElementById('monthly-profit').textContent = 'Rp8,180,000';
         }
 
         // Helper function to get filament name from ID
