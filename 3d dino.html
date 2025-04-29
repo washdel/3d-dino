@@ -719,263 +719,953 @@
         </main>
     </div>
 
-
+    <!-- Tambahkan Chart.js untuk visualisasi data -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <script>
-        // Format currency to Indonesian Rupiah format
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('id-ID').format(Math.round(value));
-        }
+        // Data aplikasi
+        const appData = {
+            settings: {
+                filamentCost: 250000, // Harga filamen per kg (Rp)
+                electricityCost: 1500, // Biaya listrik per kWh (Rp)
+                printerWattage: 350, // Daya printer dalam watt
+                silicaCost: 500, // Biaya silica gel per print (Rp)
+                otherCosts: 1000, // Biaya lain per print (Rp)
+                profitMargin: 30 // Target margin keuntungan (%)
+            },
+            products: [],
+            transactions: []
+        };
 
-        // Format date for display (e.g., "29 Apr 2025")
-        function formatDate(date) {
-            const options = { day: 'numeric', month: 'short', year: 'numeric' };
-            return date.toLocaleDateString('id-ID', options);
-        }
+        // Inisialisasi aplikasi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load data dari localStorage jika ada
+            loadData();
+            
+            // Set tanggal hari ini
+            const today = new Date();
+            document.getElementById('current-date').textContent = formatDate(today);
+            document.getElementById('transaction-date').valueAsDate = today;
+            
+            // Set default tanggal untuk laporan mingguan
+            const startOfWeek = getStartOfWeek(today);
+            const endOfWeek = getEndOfWeek(today);
+            document.getElementById('weekly-start-date').valueAsDate = startOfWeek;
+            document.getElementById('weekly-end-date').valueAsDate = endOfWeek;
+            
+            // Set default bulan dan tahun untuk laporan bulanan
+            document.getElementById('month-select').value = today.getMonth();
+            document.getElementById('year-select').value = today.getFullYear();
+            
+            // Setup tab navigation
+            setupTabs();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Update tampilan
+            updateDailyView();
+            updateProductsTable();
+            updateSettingsForm();
+            
+            // Generate laporan mingguan dan bulanan default
+            generateWeeklyReport();
+            generateMonthlyReport();
+        });
 
-        // Format date for input value (YYYY-MM-DD)
-        function formatDateValue(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        // Get ISO week number from date
-        function getWeekNumber(date) {
-            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-            const dayNum = d.getUTCDay() || 7;
-            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-        }
-
-        // Delete a product
-        function deleteProduct(id) {
-            if (confirm('Anda yakin ingin menghapus produk ini?')) {
-                // Find index of product
-                const index = products.findIndex(p => p.id === id);
-                if (index !== -1) {
-                    // Remove product
-                    products.splice(index, 1);
-                    // Save data
-                    saveData();
-                    // Update UI
-                    updateProductsTable();
-                    updateProductSelect();
-                    alert('Produk berhasil dihapus!');
-                }
-            }
-        }
-
-        // Delete a transaction
-        function deleteTransaction(id) {
-            if (confirm('Anda yakin ingin menghapus transaksi ini?')) {
-                // Find index of transaction
-                const index = transactions.findIndex(t => t.id === id);
-                if (index !== -1) {
-                    // Remove transaction
-                    transactions.splice(index, 1);
-                    // Save data
-                    saveData();
-                    // Update UI
-                    updateDailyTransactionsTable();
-                    updateSummaries();
-                    alert('Transaksi berhasil dihapus!');
-                }
-            }
-        }
-
-        // Save data to localStorage
-        function saveData() {
-            localStorage.setItem('3dprint_settings', JSON.stringify(settings));
-            localStorage.setItem('3dprint_products', JSON.stringify(products));
-            localStorage.setItem('3dprint_transactions', JSON.stringify(transactions));
-        }
-
-        // Load data from localStorage
+        // Fungsi untuk memuat data dari localStorage
         function loadData() {
-            // Load settings
-            const savedSettings = localStorage.getItem('3dprint_settings');
-            if (savedSettings) {
-                settings = JSON.parse(savedSettings);
-            }
-            
-            // Load products
-            const savedProducts = localStorage.getItem('3dprint_products');
-            if (savedProducts) {
-                products = JSON.parse(savedProducts);
-            }
-            
-            // Load transactions
-            const savedTransactions = localStorage.getItem('3dprint_transactions');
-            if (savedTransactions) {
-                transactions = JSON.parse(savedTransactions);
+            const savedData = localStorage.getItem('3dPrintingFinanceApp');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                appData.settings = parsedData.settings || appData.settings;
+                appData.products = parsedData.products || appData.products;
+                appData.transactions = parsedData.transactions || appData.transactions;
             }
         }
 
-        // Export data to JSON file
-        function exportData() {
-            const data = {
-                settings: settings,
-                products: products,
-                transactions: transactions,
-                exportDate: new Date().toISOString()
+        // Fungsi untuk menyimpan data ke localStorage
+        function saveData() {
+            localStorage.setItem('3dPrintingFinanceApp', JSON.stringify(appData));
+        }
+
+        // Fungsi untuk mengatur tab navigation
+        function setupTabs() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Hapus kelas active dari semua tab dan tombol
+                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                    
+                    // Tambahkan kelas active ke tab dan tombol yang dipilih
+                    const tabId = this.getAttribute('data-tab');
+                    this.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    // Update tampilan yang sesuai
+                    if (tabId === 'daily-tab') {
+                        updateDailyView();
+                    } else if (tabId === 'products-tab') {
+                        updateProductsTable();
+                    } else if (tabId === 'settings-tab') {
+                        updateSettingsForm();
+                    } else if (tabId === 'weekly-tab') {
+                        generateWeeklyReport();
+                    } else if (tabId === 'monthly-tab') {
+                        generateMonthlyReport();
+                    }
+                });
+            });
+        }
+
+        // Fungsi untuk mengatur event listeners
+        function setupEventListeners() {
+            // Form transaksi harian
+            document.getElementById('daily-form').addEventListener('submit', saveDailyTransaction);
+            
+            // Pilihan produk
+            document.getElementById('product-select').addEventListener('change', function() {
+                const customFields = document.getElementById('custom-product-fields');
+                if (this.value === 'custom') {
+                    customFields.style.display = 'block';
+                    document.getElementById('calculation-result').style.display = 'none';
+                } else {
+                    customFields.style.display = 'none';
+                    calculateProductCost(this.value);
+                }
+            });
+            
+            // Status pembayaran
+            document.getElementById('payment-status').addEventListener('change', function() {
+                const dpField = document.getElementById('dp-amount-field');
+                dpField.style.display = this.value === 'DP' ? 'block' : 'none';
+            });
+            
+            // Form produk
+            document.getElementById('product-form').addEventListener('submit', saveProduct);
+            
+            // Form pengaturan
+            document.getElementById('settings-form').addEventListener('submit', saveSettings);
+            
+            // Generate laporan mingguan
+            document.getElementById('generate-weekly-report').addEventListener('click', generateWeeklyReport);
+            
+            // Generate laporan bulanan
+            document.getElementById('generate-monthly-report').addEventListener('click', generateMonthlyReport);
+            
+            // Export data
+            document.getElementById('export-data').addEventListener('click', exportData);
+            
+            // Import data
+            document.getElementById('import-data').addEventListener('click', function() {
+                document.getElementById('import-file').click();
+            });
+            
+            document.getElementById('import-file').addEventListener('change', importData);
+            
+            // Reset data
+            document.getElementById('reset-transactions').addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin menghapus semua data transaksi?')) {
+                    appData.transactions = [];
+                    saveData();
+                    updateDailyView();
+                    alert('Semua data transaksi telah dihapus.');
+                }
+            });
+            
+            document.getElementById('reset-products').addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin menghapus semua data produk?')) {
+                    appData.products = [];
+                    saveData();
+                    updateProductsTable();
+                    alert('Semua data produk telah dihapus.');
+                }
+            });
+            
+            document.getElementById('reset-all').addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin menghapus SEMUA data (transaksi, produk, dan pengaturan)?')) {
+                    localStorage.removeItem('3dPrintingFinanceApp');
+                    location.reload();
+                }
+            });
+        }
+
+        // Fungsi untuk menyimpan transaksi harian
+        function saveDailyTransaction(e) {
+            e.preventDefault();
+            
+            const date = document.getElementById('transaction-date').value;
+            const customerName = document.getElementById('customer-name').value;
+            const productId = document.getElementById('product-select').value;
+            const quantity = parseInt(document.getElementById('product-quantity').value);
+            const paymentStatus = document.getElementById('payment-status').value;
+            const dpAmount = paymentStatus === 'DP' ? parseInt(document.getElementById('dp-amount').value) : 0;
+            
+            let productName, weight, printTime, price;
+            
+            if (productId === 'custom') {
+                productName = document.getElementById('custom-product-name').value;
+                weight = parseInt(document.getElementById('custom-product-weight').value);
+                printTime = parseFloat(document.getElementById('custom-product-time').value);
+                price = parseInt(document.getElementById('custom-product-price').value);
+            } else {
+                const product = appData.products.find(p => p.id === productId);
+                if (!product) {
+                    alert('Produk tidak ditemukan');
+                    return;
+                }
+                productName = product.name;
+                weight = product.weight;
+                printTime = product.printTime;
+                price = product.price;
+            }
+            
+            // Hitung biaya produksi
+            const filamentCost = (weight / 1000) * appData.settings.filamentCost;
+            const electricityCost = (appData.settings.printerWattage * printTime / 1000) * appData.settings.electricityCost;
+            const totalCost = filamentCost + electricityCost + appData.settings.silicaCost + appData.settings.otherCosts;
+            const profit = price - totalCost;
+            const profitPercentage = (profit / totalCost) * 100;
+            
+            // Buat transaksi baru
+            const transaction = {
+                id: Date.now().toString(),
+                date: date,
+                customerName: customerName,
+                productName: productName,
+                quantity: quantity,
+                weight: weight,
+                printTime: printTime,
+                price: price,
+                paymentStatus: paymentStatus,
+                dpAmount: dpAmount,
+                filamentCost: filamentCost,
+                electricityCost: electricityCost,
+                totalCost: totalCost,
+                profit: profit,
+                profitPercentage: profitPercentage
             };
             
-            const dataStr = JSON.stringify(data, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
+            // Tambahkan ke daftar transaksi
+            appData.transactions.push(transaction);
+            saveData();
             
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `3dprint_data_${formatDateValue(new Date())}.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            // Reset form
+            e.target.reset();
+            document.getElementById('transaction-date').valueAsDate = new Date();
+            document.getElementById('product-quantity').value = 1;
+            document.getElementById('custom-product-fields').style.display = 'none';
+            document.getElementById('dp-amount-field').style.display = 'none';
+            document.getElementById('calculation-result').style.display = 'none';
+            
+            // Update tampilan
+            updateDailyView();
+            
+            alert('Transaksi berhasil disimpan!');
         }
 
-        // Import data from JSON file
-        function importData(event) {
-            const file = event.target.files[0];
+        // Fungsi untuk menghitung biaya produk
+        function calculateProductCost(productId) {
+            const product = appData.products.find(p => p.id === productId);
+            if (!product) return;
+            
+            const quantity = parseInt(document.getElementById('product-quantity').value) || 1;
+            const weight = product.weight * quantity;
+            const printTime = product.printTime * quantity;
+            const price = product.price * quantity;
+            
+            const filamentCost = (weight / 1000) * appData.settings.filamentCost;
+            const electricityCost = (appData.settings.printerWattage * printTime / 1000) * appData.settings.electricityCost;
+            const totalCost = filamentCost + electricityCost + appData.settings.silicaCost + appData.settings.otherCosts;
+            const profit = price - totalCost;
+            const profitPercentage = (profit / totalCost) * 100;
+            
+            // Update tampilan kalkulasi
+            document.getElementById('calc-filament-weight').textContent = weight;
+            document.getElementById('calc-print-time').textContent = printTime.toFixed(1);
+            document.getElementById('calc-filament-cost').textContent = Math.round(filamentCost).toLocaleString();
+            document.getElementById('calc-electricity-cost').textContent = Math.round(electricityCost).toLocaleString();
+            document.getElementById('calc-total-cost').textContent = Math.round(totalCost).toLocaleString();
+            document.getElementById('calc-selling-price').textContent = Math.round(price).toLocaleString();
+            document.getElementById('calc-profit-margin').textContent = Math.round(profit).toLocaleString();
+            document.getElementById('calc-profit-percentage').textContent = profitPercentage.toFixed(1);
+            
+            document.getElementById('calculation-result').style.display = 'block';
+        }
+
+        // Fungsi untuk menyimpan produk
+        function saveProduct(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('product-name').value;
+            const weight = parseInt(document.getElementById('product-weight').value);
+            const printTime = parseFloat(document.getElementById('product-time').value);
+            const price = parseInt(document.getElementById('product-price').value);
+            const category = document.getElementById('product-category').value;
+            const description = document.getElementById('product-description').value;
+            
+            // Hitung biaya produksi
+            const filamentCost = (weight / 1000) * appData.settings.filamentCost;
+            const electricityCost = (appData.settings.printerWattage * printTime / 1000) * appData.settings.electricityCost;
+            const totalCost = filamentCost + electricityCost + appData.settings.silicaCost + appData.settings.otherCosts;
+            const profit = price - totalCost;
+            const profitPercentage = (profit / totalCost) * 100;
+            
+            // Buat produk baru
+            const product = {
+                id: Date.now().toString(),
+                name: name,
+                weight: weight,
+                printTime: printTime,
+                price: price,
+                category: category,
+                description: description,
+                filamentCost: filamentCost,
+                electricityCost: electricityCost,
+                totalCost: totalCost,
+                profit: profit,
+                profitPercentage: profitPercentage,
+                createdAt: new Date().toISOString()
+            };
+            
+            // Tambahkan ke daftar produk
+            appData.products.push(product);
+            saveData();
+            
+            // Reset form
+            e.target.reset();
+            
+            // Update tampilan
+            updateProductsTable();
+            updateProductSelect();
+            
+            alert('Produk berhasil disimpan!');
+        }
+
+        // Fungsi untuk menyimpan pengaturan
+        function saveSettings(e) {
+            e.preventDefault();
+            
+            appData.settings = {
+                filamentCost: parseInt(document.getElementById('filament-cost').value),
+                electricityCost: parseInt(document.getElementById('electricity-cost').value),
+                printerWattage: parseInt(document.getElementById('printer-wattage').value),
+                silicaCost: parseInt(document.getElementById('silica-cost').value),
+                otherCosts: parseInt(document.getElementById('other-costs').value),
+                profitMargin: parseInt(document.getElementById('profit-margin').value)
+            };
+            
+            saveData();
+            
+            alert('Pengaturan berhasil disimpan!');
+        }
+
+        // Fungsi untuk mengupdate tampilan harian
+        function updateDailyView() {
+            const today = new Date();
+            const todayStr = formatDate(today, 'yyyy-mm-dd');
+            
+            // Filter transaksi hari ini
+            const dailyTransactions = appData.transactions.filter(t => t.date === todayStr);
+            
+            // Update info box
+            document.getElementById('total-daily-transactions').textContent = dailyTransactions.length;
+            
+            const totalIncome = dailyTransactions.reduce((sum, t) => sum + t.price, 0);
+            document.getElementById('total-daily-income').textContent = `Rp ${totalIncome.toLocaleString()}`;
+            
+            // Update tabel transaksi
+            const tbody = document.getElementById('daily-transactions').querySelector('tbody');
+            tbody.innerHTML = '';
+            
+            dailyTransactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${formatDate(transaction.date)}</td>
+                    <td>${transaction.customerName}</td>
+                    <td>${transaction.productName}</td>
+                    <td>${transaction.quantity}</td>
+                    <td>${transaction.weight}</td>
+                    <td>${transaction.printTime.toFixed(1)}</td>
+                    <td>Rp ${transaction.price.toLocaleString()}</td>
+                    <td>${transaction.paymentStatus}</td>
+                    <td>
+                        <button class="btn-small btn-danger" data-id="${transaction.id}">Hapus</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // Tambahkan event listener untuk tombol hapus
+            document.querySelectorAll('#daily-transactions .btn-danger').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    deleteTransaction(id);
+                });
+            });
+            
+            // Update ringkasan harian
+            updateDailySummary(dailyTransactions);
+            
+            // Update dropdown produk
+            updateProductSelect();
+        }
+
+        // Fungsi untuk mengupdate dropdown pilihan produk
+        function updateProductSelect() {
+            const select = document.getElementById('product-select');
+            
+            // Simpan nilai yang dipilih saat ini
+            const selectedValue = select.value;
+            
+            // Hapus semua opsi kecuali yang pertama dan custom
+            while (select.options.length > 2) {
+                select.remove(1);
+            }
+            
+            // Tambahkan produk dari database
+            appData.products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = product.name;
+                select.insertBefore(option, select.lastChild);
+            });
+            
+            // Kembalikan nilai yang dipilih sebelumnya jika masih ada
+            if (selectedValue && (selectedValue === 'custom' || appData.products.some(p => p.id === selectedValue))) {
+                select.value = selectedValue;
+            }
+        }
+
+        // Fungsi untuk mengupdate ringkasan harian
+        function updateDailySummary(transactions) {
+            const totalTransactions = transactions.length;
+            const totalIncome = transactions.reduce((sum, t) => sum + t.price, 0);
+            const totalCosts = transactions.reduce((sum, t) => sum + t.totalCost, 0);
+            const totalProfit = transactions.reduce((sum, t) => sum + t.profit, 0);
+            const totalFilament = transactions.reduce((sum, t) => sum + t.weight, 0);
+            const totalPrintTime = transactions.reduce((sum, t) => sum + t.printTime, 0);
+            
+            document.getElementById('summary-daily-transactions').textContent = totalTransactions;
+            document.getElementById('summary-daily-income').textContent = `Rp ${totalIncome.toLocaleString()}`;
+            document.getElementById('summary-daily-costs').textContent = `Rp ${totalCosts.toLocaleString()}`;
+            document.getElementById('summary-daily-profit').textContent = `Rp ${totalProfit.toLocaleString()}`;
+            document.getElementById('summary-daily-filament').textContent = `${totalFilament} gram`;
+            document.getElementById('summary-daily-print-time').textContent = `${totalPrintTime.toFixed(1)} jam`;
+        }
+
+        // Fungsi untuk mengupdate tabel produk
+        function updateProductsTable() {
+            const tbody = document.getElementById('products-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            
+            appData.products.forEach(product => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.category || '-'}</td>
+                    <td>${product.weight}</td>
+                    <td>${product.printTime.toFixed(1)}</td>
+                    <td>Rp ${product.price.toLocaleString()}</td>
+                    <td>Rp ${Math.round(product.totalCost).toLocaleString()}</td>
+                    <td>${product.profitPercentage.toFixed(1)}%</td>
+                    <td>
+                        <button class="btn-small btn-danger" data-id="${product.id}">Hapus</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // Tambahkan event listener untuk tombol hapus
+            document.querySelectorAll('#products-table .btn-danger').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    deleteProduct(id);
+                });
+            });
+        }
+
+        // Fungsi untuk mengupdate form pengaturan
+        function updateSettingsForm() {
+            document.getElementById('filament-cost').value = appData.settings.filamentCost;
+            document.getElementById('electricity-cost').value = appData.settings.electricityCost;
+            document.getElementById('printer-wattage').value = appData.settings.printerWattage;
+            document.getElementById('silica-cost').value = appData.settings.silicaCost;
+            document.getElementById('other-costs').value = appData.settings.otherCosts;
+            document.getElementById('profit-margin').value = appData.settings.profitMargin;
+        }
+
+        // Fungsi untuk menghapus transaksi
+        function deleteTransaction(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
+                appData.transactions = appData.transactions.filter(t => t.id !== id);
+                saveData();
+                updateDailyView();
+            }
+        }
+
+        // Fungsi untuk menghapus produk
+        function deleteProduct(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
+                appData.products = appData.products.filter(p => p.id !== id);
+                saveData();
+                updateProductsTable();
+                updateProductSelect();
+            }
+        }
+
+        // Fungsi untuk generate laporan mingguan
+        function generateWeeklyReport() {
+            const startDate = document.getElementById('weekly-start-date').value;
+            const endDate = document.getElementById('weekly-end-date').value;
+            
+            if (!startDate || !endDate) {
+                alert('Silakan pilih tanggal mulai dan tanggal akhir');
+                return;
+            }
+            
+            // Filter transaksi dalam rentang tanggal
+            const weeklyTransactions = appData.transactions.filter(t => {
+                return t.date >= startDate && t.date <= endDate;
+            });
+            
+            // Kelompokkan transaksi per hari
+            const transactionsByDay = {};
+            weeklyTransactions.forEach(t => {
+                if (!transactionsByDay[t.date]) {
+                    transactionsByDay[t.date] = [];
+                }
+                transactionsByDay[t.date].push(t);
+            });
+            
+            // Urutkan tanggal
+            const sortedDates = Object.keys(transactionsByDay).sort();
+            
+            // Update info box
+            document.getElementById('weekly-period').textContent = `${formatDate(startDate)} - ${formatDate(endDate)}`;
+            document.getElementById('weekly-total-transactions').textContent = weeklyTransactions.length;
+            
+            const totalIncome = weeklyTransactions.reduce((sum, t) => sum + t.price, 0);
+            document.getElementById('weekly-total-income').textContent = `Rp ${totalIncome.toLocaleString()}`;
+            
+            // Update tabel summary
+            const tbody = document.getElementById('weekly-summary-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            
+            sortedDates.forEach(date => {
+                const dayTransactions = transactionsByDay[date];
+                const dayIncome = dayTransactions.reduce((sum, t) => sum + t.price, 0);
+                const dayCosts = dayTransactions.reduce((sum, t) => sum + t.totalCost, 0);
+                const dayProfit = dayTransactions.reduce((sum, t) => sum + t.profit, 0);
+                const dayFilament = dayTransactions.reduce((sum, t) => sum + t.weight, 0);
+                const dayPrintTime = dayTransactions.reduce((sum, t) => sum + t.printTime, 0);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatDate(date)}</td>
+                    <td>${dayTransactions.length}</td>
+                    <td>Rp ${dayIncome.toLocaleString()}</td>
+                    <td>Rp ${dayCosts.toLocaleString()}</td>
+                    <td>Rp ${dayProfit.toLocaleString()}</td>
+                    <td>${dayFilament}</td>
+                    <td>${dayPrintTime.toFixed(1)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Update ringkasan mingguan
+            updateWeeklySummary(weeklyTransactions, sortedDates.length);
+            
+            // Buat chart
+            createWeeklyChart(sortedDates, transactionsByDay);
+        }
+
+        // Fungsi untuk mengupdate ringkasan mingguan
+        function updateWeeklySummary(transactions, daysCount) {
+            const totalTransactions = transactions.length;
+            const totalIncome = transactions.reduce((sum, t) => sum + t.price, 0);
+            const totalCosts = transactions.reduce((sum, t) => sum + t.totalCost, 0);
+            const totalProfit = transactions.reduce((sum, t) => sum + t.profit, 0);
+            const totalFilament = transactions.reduce((sum, t) => sum + t.weight, 0);
+            const totalPrintTime = transactions.reduce((sum, t) => sum + t.printTime, 0);
+            
+            document.getElementById('summary-weekly-transactions').textContent = totalTransactions;
+            document.getElementById('summary-weekly-income').textContent = `Rp ${totalIncome.toLocaleString()}`;
+            document.getElementById('summary-weekly-costs').textContent = `Rp ${totalCosts.toLocaleString()}`;
+            document.getElementById('summary-weekly-profit').textContent = `Rp ${totalProfit.toLocaleString()}`;
+            document.getElementById('summary-weekly-filament').textContent = `${totalFilament} gram`;
+            document.getElementById('summary-weekly-print-time').textContent = `${totalPrintTime.toFixed(1)} jam`;
+            
+            const avgTransactions = daysCount > 0 ? (totalTransactions / daysCount).toFixed(1) : 0;
+            const avgIncome = daysCount > 0 ? (totalIncome / daysCount).toFixed(0) : 0;
+            
+            document.getElementById('summary-weekly-avg-transactions').textContent = avgTransactions;
+            document.getElementById('summary-weekly-avg-income').textContent = `Rp ${avgIncome}`;
+        }
+
+        // Fungsi untuk membuat chart mingguan
+        function createWeeklyChart(dates, transactionsByDay) {
+            const ctx = document.getElementById('weekly-chart').getContext('2d');
+            
+            // Hapus chart sebelumnya jika ada
+            if (window.weeklyChart) {
+                window.weeklyChart.destroy();
+            }
+            
+            const incomeData = dates.map(date => {
+                const dayTransactions = transactionsByDay[date];
+                return dayTransactions.reduce((sum, t) => sum + t.price, 0);
+            });
+            
+            const costData = dates.map(date => {
+                const dayTransactions = transactionsByDay[date];
+                return dayTransactions.reduce((sum, t) => sum + t.totalCost, 0);
+            });
+            
+            window.weeklyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dates.map(date => formatDate(date)),
+                    datasets: [
+                        {
+                            label: 'Pendapatan',
+                            data: incomeData,
+                            backgroundColor: '#4e73df',
+                            borderColor: '#4e73df',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Biaya',
+                            data: costData,
+                            backgroundColor: '#e74a3b',
+                            borderColor: '#e74a3b',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'Rp ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': Rp ' + context.raw.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Fungsi untuk generate laporan bulanan
+        function generateMonthlyReport() {
+            const month = parseInt(document.getElementById('month-select').value);
+            const year = parseInt(document.getElementById('year-select').value);
+            
+            // Filter transaksi bulan dan tahun yang dipilih
+            const monthlyTransactions = appData.transactions.filter(t => {
+                const date = new Date(t.date);
+                return date.getMonth() === month && date.getFullYear() === year;
+            });
+            
+            // Kelompokkan transaksi per minggu
+            const transactionsByWeek = {};
+            monthlyTransactions.forEach(t => {
+                const date = new Date(t.date);
+                const weekNumber = getWeekOfMonth(date);
+                
+                if (!transactionsByWeek[weekNumber]) {
+                    transactionsByWeek[weekNumber] = [];
+                }
+                transactionsByWeek[weekNumber].push(t);
+            });
+            
+            // Urutkan minggu
+            const sortedWeeks = Object.keys(transactionsByWeek).sort((a, b) => a - b);
+            
+            // Update info box
+            const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            document.getElementById('monthly-period').textContent = `${monthNames[month]} ${year}`;
+            document.getElementById('monthly-total-transactions').textContent = monthlyTransactions.length;
+            
+            const totalIncome = monthlyTransactions.reduce((sum, t) => sum + t.price, 0);
+            document.getElementById('monthly-total-income').textContent = `Rp ${totalIncome.toLocaleString()}`;
+            
+            // Update tabel summary
+            const tbody = document.getElementById('monthly-summary-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            
+            sortedWeeks.forEach(week => {
+                const weekTransactions = transactionsByWeek[week];
+                const weekIncome = weekTransactions.reduce((sum, t) => sum + t.price, 0);
+                const weekCosts = weekTransactions.reduce((sum, t) => sum + t.totalCost, 0);
+                const weekProfit = weekTransactions.reduce((sum, t) => sum + t.profit, 0);
+                const weekFilament = weekTransactions.reduce((sum, t) => sum + t.weight, 0);
+                const weekPrintTime = weekTransactions.reduce((sum, t) => sum + t.printTime, 0);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>Minggu ${week}</td>
+                    <td>${weekTransactions.length}</td>
+                    <td>Rp ${weekIncome.toLocaleString()}</td>
+                    <td>Rp ${weekCosts.toLocaleString()}</td>
+                    <td>Rp ${weekProfit.toLocaleString()}</td>
+                    <td>${weekFilament}</td>
+                    <td>${weekPrintTime.toFixed(1)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Update tabel produk terlaris
+            updateTopProductsTable(monthlyTransactions);
+            
+            // Update ringkasan bulanan
+            updateMonthlySummary(monthlyTransactions, month, year);
+            
+            // Buat chart
+            createMonthlyChart(sortedWeeks, transactionsByWeek);
+        }
+
+        // Fungsi untuk mengupdate tabel produk terlaris
+        function updateTopProductsTable(transactions) {
+            // Kelompokkan transaksi per produk
+            const productsSummary = {};
+            
+            transactions.forEach(t => {
+                if (!productsSummary[t.productName]) {
+                    productsSummary[t.productName] = {
+                        count: 0,
+                        totalIncome: 0,
+                        totalFilament: 0,
+                        totalPrintTime: 0
+                    };
+                }
+                
+                productsSummary[t.productName].count += t.quantity;
+                productsSummary[t.productName].totalIncome += t.price;
+                productsSummary[t.productName].totalFilament += t.weight;
+                productsSummary[t.productName].totalPrintTime += t.printTime;
+            });
+            
+            // Urutkan berdasarkan jumlah terjual
+            const sortedProducts = Object.keys(productsSummary).sort((a, b) => productsSummary[b].count - productsSummary[a].count);
+            
+            // Update tabel
+            const tbody = document.getElementById('top-products-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            
+            sortedProducts.slice(0, 5).forEach(productName => {
+                const summary = productsSummary[productName];
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${productName}</td>
+                    <td>${summary.count}</td>
+                    <td>Rp ${summary.totalIncome.toLocaleString()}</td>
+                    <td>${summary.totalFilament}</td>
+                    <td>${summary.totalPrintTime.toFixed(1)}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Fungsi untuk mengupdate ringkasan bulanan
+        function updateMonthlySummary(transactions, month, year) {
+            const totalTransactions = transactions.length;
+            const totalIncome = transactions.reduce((sum, t) => sum + t.price, 0);
+            const totalCosts = transactions.reduce((sum, t) => sum + t.totalCost, 0);
+            const totalProfit = transactions.reduce((sum, t) => sum + t.profit, 0);
+            const totalFilament = transactions.reduce((sum, t) => sum + t.weight, 0);
+            const totalPrintTime = transactions.reduce((sum, t) => sum + t.printTime, 0);
+            
+            // Hitung jumlah hari dalam bulan
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            document.getElementById('summary-monthly-transactions').textContent = totalTransactions;
+            document.getElementById('summary-monthly-income').textContent = `Rp ${totalIncome.toLocaleString()}`;
+            document.getElementById('summary-monthly-costs').textContent = `Rp ${totalCosts.toLocaleString()}`;
+            document.getElementById('summary-monthly-profit').textContent = `Rp ${totalProfit.toLocaleString()}`;
+            document.getElementById('summary-monthly-filament').textContent = `${totalFilament} gram`;
+            document.getElementById('summary-monthly-print-time').textContent = `${totalPrintTime.toFixed(1)} jam`;
+            
+            const avgTransactions = daysInMonth > 0 ? (totalTransactions / daysInMonth).toFixed(1) : 0;
+            const avgIncome = daysInMonth > 0 ? (totalIncome / daysInMonth).toFixed(0) : 0;
+            
+            document.getElementById('summary-monthly-avg-transactions').textContent = avgTransactions;
+            document.getElementById('summary-monthly-avg-income').textContent = `Rp ${avgIncome}`;
+        }
+
+        // Fungsi untuk membuat chart bulanan
+        function createMonthlyChart(weeks, transactionsByWeek) {
+            const ctx = document.getElementById('monthly-chart').getContext('2d');
+            
+            // Hapus chart sebelumnya jika ada
+            if (window.monthlyChart) {
+                window.monthlyChart.destroy();
+            }
+            
+            const incomeData = weeks.map(week => {
+                const weekTransactions = transactionsByWeek[week];
+                return weekTransactions.reduce((sum, t) => sum + t.price, 0);
+            });
+            
+            const costData = weeks.map(week => {
+                const weekTransactions = transactionsByWeek[week];
+                return weekTransactions.reduce((sum, t) => sum + t.totalCost, 0);
+            });
+            
+            window.monthlyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: weeks.map(week => `Minggu ${week}`),
+                    datasets: [
+                        {
+                            label: 'Pendapatan',
+                            data: incomeData,
+                            backgroundColor: '#4e73df',
+                            borderColor: '#4e73df',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Biaya',
+                            data: costData,
+                            backgroundColor: '#e74a3b',
+                            borderColor: '#e74a3b',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'Rp ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': Rp ' + context.raw.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Fungsi untuk export data ke JSON
+        function exportData() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `backup-data-3dprinting-${formatDate(new Date(), 'yyyy-mm-dd')}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        // Fungsi untuk import data dari JSON
+        function importData(e) {
+            const file = e.target.files[0];
             if (!file) return;
             
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    const data = JSON.parse(e.target.result);
+                    const importedData = JSON.parse(e.target.result);
                     
-                    // Validate data structure
-                    if (data.settings && data.products && data.transactions) {
-                        // Confirm import
-                        if (confirm('Data akan diimpor dan menggantikan data yang ada. Lanjutkan?')) {
-                            settings = data.settings;
-                            products = data.products;
-                            transactions = data.transactions;
-                            
-                            // Save to localStorage
-                            saveData();
-                            
-                            // Update UI
-                            updateProductsTable();
-                            updateProductSelect();
-                            updateDailyTransactionsTable();
-                            updateSummaries();
-                            loadSettingsToForm();
-                            
-                            alert('Data berhasil diimpor!');
-                        }
-                    } else {
-                        alert('Format file tidak valid!');
+                    if (confirm('Apakah Anda yakin ingin mengimpor data ini? Data saat ini akan diganti.')) {
+                        appData.settings = importedData.settings || appData.settings;
+                        appData.products = importedData.products || appData.products;
+                        appData.transactions = importedData.transactions || appData.transactions;
+                        
+                        saveData();
+                        location.reload();
                     }
                 } catch (error) {
-                    alert('Gagal memproses file! ' + error.message);
+                    alert('Gagal membaca file. Pastikan file yang dipilih valid.');
                 }
             };
             reader.readAsText(file);
             
-            // Reset file input
-            event.target.value = '';
+            // Reset input file
+            e.target.value = '';
         }
 
-        // Reset transactions
-        function resetTransactions() {
-            if (confirm('Anda yakin ingin menghapus semua data transaksi? Tindakan ini tidak dapat dibatalkan!')) {
-                transactions = [];
-                saveData();
-                updateDailyTransactionsTable();
-                updateSummaries();
-                alert('Data transaksi berhasil dihapus!');
+        // Fungsi utilitas untuk memformat tanggal
+        function formatDate(date, format = 'dd-mm-yyyy') {
+            if (!date) return '';
+            
+            let dateObj;
+            if (typeof date === 'string') {
+                dateObj = new Date(date);
+            } else {
+                dateObj = date;
             }
-        }
-
-        // Reset products
-        function resetProducts() {
-            if (confirm('Anda yakin ingin menghapus semua data produk? Tindakan ini tidak dapat dibatalkan!')) {
-                products = [];
-                saveData();
-                updateProductsTable();
-                updateProductSelect();
-                alert('Data produk berhasil dihapus!');
+            
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const year = dateObj.getFullYear();
+            
+            if (format === 'dd-mm-yyyy') {
+                return `${day}/${month}/${year}`;
+            } else if (format === 'yyyy-mm-dd') {
+                return `${year}-${month}-${day}`;
             }
+            
+            return dateObj.toLocaleDateString();
         }
 
-        // Reset all data
-        function resetAllData() {
-            if (confirm('Anda yakin ingin menghapus SEMUA data aplikasi? Tindakan ini tidak dapat dibatalkan!')) {
-                settings = {
-                    filamentCost: 350000,
-                    electricityCost: 1500,
-                    printerWattage: 250,
-                    silicaCost: 2000,
-                    otherCosts: 5000,
-                    profitMargin: 50
-                };
-                products = [];
-                transactions = [];
-                
-                saveData();
-                
-                updateProductsTable();
-                updateProductSelect();
-                updateDailyTransactionsTable();
-                updateSummaries();
-                loadSettingsToForm();
-                
-                alert('Semua data berhasil direset ke pengaturan awal!');
-            }
+        // Fungsi utilitas untuk mendapatkan awal minggu (Senin)
+        function getStartOfWeek(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is Sunday
+            return new Date(d.setDate(diff));
         }
 
-        // Load settings values to form
-        function loadSettingsToForm() {
-            document.getElementById('filament-cost').value = settings.filamentCost;
-            document.getElementById('electricity-cost').value = settings.electricityCost;
-            document.getElementById('printer-wattage').value = settings.printerWattage;
-            document.getElementById('silica-cost').value = settings.silicaCost;
-            document.getElementById('other-costs').value = settings.otherCosts;
-            document.getElementById('profit-margin').value = settings.profitMargin;
+        // Fungsi utilitas untuk mendapatkan akhir minggu (Minggu)
+        function getEndOfWeek(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() + (day === 0 ? 0 : 7 - day); // adjust when day is Sunday
+            return new Date(d.setDate(diff));
         }
 
-        // Complete the updateSummaries function that was cut off
-        function updateSummaries() {
-            // Daily summary
-            const today = formatDateValue(new Date());
-            const todayTransactions = transactions.filter(tx => tx.date === today);
+        // Fungsi utilitas untuk mendapatkan minggu ke berapa dalam bulan
+        function getWeekOfMonth(date) {
+            const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+            const firstWeekDay = firstDay === 0 ? 7 : firstDay; // Make Sunday 7
+            const dayOfMonth = date.getDate();
             
-            const dailyTotal = todayTransactions.length;
-            const dailyIncome = todayTransactions.reduce((sum, tx) => sum + tx.totalPrice, 0);
-            const dailyCosts = todayTransactions.reduce((sum, tx) => sum + tx.totalCost, 0);
-            const dailyProfit = todayTransactions.reduce((sum, tx) => sum + tx.profitMargin, 0);
-            const dailyFilament = todayTransactions.reduce((sum, tx) => sum + tx.totalWeight, 0);
-            const dailyTime = todayTransactions.reduce((sum, tx) => sum + tx.totalTime, 0);
-            
-            document.getElementById('summary-daily-transactions').textContent = dailyTotal;
-            document.getElementById('summary-daily-income').textContent = 'Rp ' + formatCurrency(dailyIncome);
-            document.getElementById('summary-daily-costs').textContent = 'Rp ' + formatCurrency(dailyCosts);
-            document.getElementById('summary-daily-profit').textContent = 'Rp ' + formatCurrency(dailyProfit);
-            document.getElementById('summary-daily-filament').textContent = dailyFilament.toFixed(0) + ' gram';
-            document.getElementById('summary-daily-print-time').textContent = dailyTime.toFixed(1) + ' jam';
-            
-            // Total summary (all time)
-            const totalTransactions = transactions.length;
-            const totalIncome = transactions.reduce((sum, tx) => sum + tx.totalPrice, 0);
-            const totalCosts = transactions.reduce((sum, tx) => sum + tx.totalCost, 0);
-            const totalProfit = transactions.reduce((sum, tx) => sum + tx.profitMargin, 0);
-            const totalFilament = transactions.reduce((sum, tx) => sum + tx.totalWeight, 0);
-            const totalTime = transactions.reduce((sum, tx) => sum + tx.totalTime, 0);
-            
-            document.getElementById('summary-total-transactions').textContent = totalTransactions;
-            document.getElementById('summary-total-income').textContent = 'Rp ' + formatCurrency(totalIncome);
-            document.getElementById('summary-total-costs').textContent = 'Rp ' + formatCurrency(totalCosts);
-            document.getElementById('summary-total-profit').textContent = 'Rp ' + formatCurrency(totalProfit);
-            document.getElementById('summary-total-filament').textContent = totalFilament.toFixed(0) + ' gram';
-            document.getElementById('summary-total-print-time').textContent = totalTime.toFixed(1) + ' jam';
-            
-            // Calculate pending payments
-            const pendingTransactions = transactions.filter(tx => tx.paymentStatus === 'DP');
-            const pendingAmount = pendingTransactions.reduce(
-                (sum, tx) => sum + (tx.totalPrice - tx.dpAmount), 0
-            );
-            document.getElementById('summary-pending-payments').textContent = 'Rp ' + formatCurrency(pendingAmount);
+            return Math.ceil((dayOfMonth + firstWeekDay - 1) / 7);
         }
     </script>
 </body>
