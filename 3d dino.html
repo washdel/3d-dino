@@ -267,6 +267,41 @@
                 grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             }
         }
+
+        .delete-product, .delete-filament {
+            background-color: var(--warning);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .delete-product:hover, .delete-filament:hover {
+            background-color: #c0392b;
+        }
+
+        .product-details button {
+            margin-top: 8px;
+        }
+
+        #filament-inventory button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+
+        .update-inventory {
+            background-color: var(--info);
+        }
+
+        .update-inventory:hover {
+            background-color: #d35400;
+        }
     </style>
 </head>
 <body>
@@ -551,8 +586,11 @@
             <h3>Daftar Produk Preset</h3>
             <p>Klik produk untuk melihat detail dan menambahkannya ke catatan harian</p>
             
-            <div class="product-grid">
-                
+            <h3 style="margin-top: 2rem;">Daftar Produk Preset</h3>
+            <p>Klik produk untuk melihat detail dan menambahkannya ke catatan harian</p>
+
+            <div class="product-grid" id="product-list">
+                <!-- Products will be populated here -->
             </div>
             
             <h3 style="margin-top: 2rem;">Tambah/Edit Produk Preset</h3>
@@ -597,8 +635,8 @@
                             <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        
+                    <tbody id="filament-list">
+                        <!-- Filaments will be populated here -->
                     </tbody>
                 </table>
             </div>
@@ -1201,6 +1239,143 @@
                 `;
                 tbody.appendChild(row);
             });
+
+            // Function to load and display all products with delete buttons
+            function loadAllProducts() {
+                const products = JSON.parse(localStorage.getItem('products')) || {};
+                const productList = document.getElementById('product-list');
+                productList.innerHTML = '';
+
+                for (const [id, product] of Object.entries(products)) {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card';
+                    productCard.setAttribute('data-product', id);
+                    
+                    productCard.innerHTML = `
+                        <div class="product-image">${product.name}</div>
+                        <div class="product-details">
+                            <h4>${product.name}</h4>
+                            <div class="product-stats">
+                                <span>${product.filament}g filamen</span>
+                                <span>${product.time} jam</span>
+                            </div>
+                            <div class="product-price">Rp${formatNumber(product.price)}</div>
+                            <a href="#" class="quick-add">Tambah ke Catatan</a>
+                            <button class="delete-product" data-id="${id}">Hapus Produk</button>
+                        </div>
+                    `;
+                    
+                    productList.appendChild(productCard);
+                }
+
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-product').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const productId = this.getAttribute('data-id');
+                        deleteProduct(productId);
+                    });
+                });
+
+                // Re-add quick add event listeners
+                document.querySelectorAll('.quick-add').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const productCard = this.closest('.product-card');
+                        const productId = productCard.getAttribute('data-product');
+                        
+                        // Switch to daily tab
+                        document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                        
+                        document.querySelector('.tab-link[data-tab="daily"]').classList.add('active');
+                        document.getElementById('daily').classList.add('active');
+                        
+                        // Set product
+                        document.getElementById('product-select').value = productId;
+                        
+                        // Trigger change event
+                        const event = new Event('change');
+                        document.getElementById('product-select').dispatchEvent(event);
+                    });
+                });
+            }
+
+            // Function to delete a product
+            function deleteProduct(productId) {
+                if (confirm(`Apakah Anda yakin ingin menghapus produk ini?`)) {
+                    const products = JSON.parse(localStorage.getItem('products')) || {};
+                    delete products[productId];
+                    localStorage.setItem('products', JSON.stringify(products));
+                    loadAllProducts();
+                }
+            }
+
+            // Function to load and display all filaments with delete buttons
+            function loadAllFilaments() {
+                const filaments = JSON.parse(localStorage.getItem('filamentInventory')) || {};
+                const filamentList = document.getElementById('filament-list');
+                filamentList.innerHTML = '';
+
+                for (const [id, filament] of Object.entries(filaments)) {
+                    const remaining = filament.initial - filament.used;
+                    const status = remaining <= 0 ? 'Habis' : remaining < 100 ? 'Hampir Habis' : 'Tersedia';
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${filament.name}</td>
+                        <td>${formatNumber(filament.initial)}g</td>
+                        <td>${formatNumber(filament.used)}g</td>
+                        <td>${formatNumber(remaining)}g</td>
+                        <td>Rp${formatNumber(filament.price)}</td>
+                        <td>${status}</td>
+                        <td>
+                            <button class="update-inventory" data-id="${id}">Tambah Stok</button>
+                            <button class="delete-filament" data-id="${id}">Hapus</button>
+                        </td>
+                    `;
+                    
+                    filamentList.appendChild(row);
+                }
+
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-filament').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const filamentId = this.getAttribute('data-id');
+                        deleteFilament(filamentId);
+                    });
+                });
+
+                // Re-add update inventory event listeners
+                document.querySelectorAll('.update-inventory').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const filamentId = this.getAttribute('data-id');
+                        const filaments = JSON.parse(localStorage.getItem('filamentInventory'));
+                        const filament = filaments[filamentId];
+                        
+                        const newAmount = prompt(`Tambah stok untuk ${filament.name} (dalam gram):`, '0');
+                        if (newAmount === null) return;
+                        
+                        const amount = parseFloat(newAmount) || 0;
+                        if (amount <= 0) return;
+                        
+                        filaments[filamentId].initial += amount;
+                        localStorage.setItem('filamentInventory', JSON.stringify(filaments));
+                        loadAllFilaments();
+                    });
+                });
+            }
+
+            // Function to delete a filament
+            function deleteFilament(filamentId) {
+                if (confirm(`Apakah Anda yakin ingin menghapus filamen ini?`)) {
+                    const filaments = JSON.parse(localStorage.getItem('filamentInventory')) || {};
+                    delete filaments[filamentId];
+                    localStorage.setItem('filamentInventory', JSON.stringify(filaments));
+                    loadAllFilaments();
+                }
+            }
             
             // Update summary
             document.getElementById('monthly-products').textContent = totalProducts;
@@ -1245,6 +1420,44 @@
             // Add event listener for week select change
             document.getElementById('week-select').addEventListener('change', loadWeeklyRecords);
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+    // ... existing code ...
+    
+    // Load products and filaments
+    loadAllProducts();
+    loadAllFilaments();
+    
+    // Update tab navigation to reload when switching tabs
+    const tabLinks = document.querySelectorAll('.tab-link');
+    tabLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Deactivate all tabs
+            document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            // Activate selected tab
+            this.classList.add('active');
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+            
+            // Load data for the tab
+            if (tabId === 'daily') {
+                loadDailyRecords();
+            } else if (tabId === 'weekly') {
+                loadWeeklyRecords();
+            } else if (tabId === 'monthly') {
+                loadMonthlyRecords();
+            } else if (tabId === 'products') {
+                loadAllProducts();
+            } else if (tabId === 'inventory') {
+                loadAllFilaments();
+            }
+        });
+    });
+});
     </script>
 </body>
 </html>
