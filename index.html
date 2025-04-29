@@ -715,10 +715,8 @@
 
     <script>
         // Set current date
-        document.addEventListener('DOMContentLoaded', function() {
-
-            loadAllProducts();
-            loadAllFilaments();
+        loadAllProducts();
+        loadAllFilaments();
             
             // Update tab navigation to reload when switching tabs
             const tabLinks = document.querySelectorAll('.tab-link');
@@ -749,6 +747,8 @@
                     }
                 });
             });
+
+        document.addEventListener('DOMContentLoaded', function() {
 
 
             const today = new Date();
