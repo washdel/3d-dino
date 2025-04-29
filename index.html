@@ -394,27 +394,27 @@
                 <div class="summary-data">
                     <div class="data-item">
                         <div class="label">Total Produk</div>
-                        <div class="value" id="weekly-products">0</div>
+                        <div class="value" id="weekly-products">-</div>
                     </div>
                     <div class="data-item">
                         <div class="label">Penggunaan Filamen</div>
-                        <div class="value" id="weekly-filament">0g</div>
+                        <div class="value" id="weekly-filament">-</div>
                     </div>
                     <div class="data-item">
                         <div class="label">Total Waktu Cetak</div>
-                        <div class="value" id="weekly-time">0 jam</div>
+                        <div class="value" id="weekly-time">-</div>
                     </div>
                     <div class="data-item">
                         <div class="label">Total Pendapatan</div>
-                        <div class="value" id="weekly-revenue">Rp0</div>
+                        <div class="value" id="weekly-revenue">-</div>
                     </div>
                     <div class="data-item">
                         <div class="label">Total Biaya</div>
-                        <div class="value" id="weekly-cost">Rp0</div>
+                        <div class="value" id="weekly-cost">-</div>
                     </div>
                     <div class="data-item">
                         <div class="label">Profit</div>
-                        <div class="value" id="weekly-profit">Rp0</div>
+                        <div class="value" id="weekly-profit">-</div>
                     </div>
                 </div>
             </div>
@@ -435,13 +435,16 @@
                 </thead>
                 <tbody>
                     <!-- Data will be populated here -->
+                    <tr>
+                        <td colspan="8" style="text-align: center;">Belum ada data</td>
+                    </tr>
                 </tbody>
             </table>
             
             <div class="summary-card">
                 <h3>Produk Terpopuler</h3>
                 <div id="popular-products-chart" style="height: 300px; background: #eee; display: flex; align-items: center; justify-content: center;">
-                    Chart akan ditampilkan di sini
+                    Belum ada data
                 </div>
             </div>
         </div>
@@ -473,27 +476,27 @@
                 <div class="summary-data">
                     <div class="data-item">
                         <div class="label">Total Produk</div>
-                        <div class="value" id="monthly-products">0</div>
+                        <div class="value" id="monthly-products">-</div>
                     </div>
                     <div class="data-item">
                         <div class="label">Penggunaan Filamen</div>
-                        <div class="value" id="monthly-filament">0g</div>
+                        <div class="value" id="monthly-filament">-</div>
                     </div>
                     <div class="data-item">
                         <div class="label">Total Waktu Cetak</div>
-                        <div class="value" id="monthly-time">0 jam</div>
+                        <div class="value" id="monthly-time">-</div>
                     </div>
                     <div class="data-item">
                         <div class="label">Total Pendapatan</div>
-                        <div class="value" id="monthly-revenue">Rp0</div>
+                        <div class="value" id="monthly-revenue">-</div>
                     </div>
                     <div class="data-item">
                         <div class="label">Total Biaya</div>
-                        <div class="value" id="monthly-cost">Rp0</div>
+                        <div class="value" id="monthly-cost">-</div>
                     </div>
                     <div class="data-item">
                         <div class="label">Profit</div>
-                        <div class="value" id="monthly-profit">Rp0</div>
+                        <div class="value" id="monthly-profit">-</div>
                     </div>
                 </div>
             </div>
@@ -501,14 +504,14 @@
             <div class="summary-card">
                 <h3>Tren Mingguan dalam Bulan</h3>
                 <div id="weekly-trend-chart" style="height: 300px; background: #eee; display: flex; align-items: center; justify-content: center;">
-                    Chart akan ditampilkan di sini
+                    Belum ada data
                 </div>
             </div>
             
             <div class="summary-card">
                 <h3>Distribusi Penggunaan Filamen</h3>
                 <div id="filament-distribution-chart" style="height: 300px; background: #eee; display: flex; align-items: center; justify-content: center;">
-                    Chart akan ditampilkan di sini
+                    Belum ada data
                 </div>
             </div>
             
@@ -528,12 +531,14 @@
                 </thead>
                 <tbody>
                     <!-- Data will be populated here -->
+                    <tr>
+                        <td colspan="8" style="text-align: center;">Belum ada data</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
-        
-        <!-- Products & Calculations Tab -->
-        <div id="products" class="tab-content">
+           <!-- Products & Calculations Tab -->
+           <div id="products" class="tab-content">
             <h2>Produk & Kalkulasi Otomatis</h2>
             
             <div class="form-group">
@@ -552,7 +557,10 @@
             <p>Klik produk untuk melihat detail dan menambahkannya ke catatan harian</p>
             
             <div class="product-grid">
-                
+                <!-- Product cards will be generated here -->
+                <div style="text-align: center; grid-column: 1/-1; padding: 2rem;">
+                    Belum ada produk preset
+                </div>
             </div>
             
             <h3 style="margin-top: 2rem;">Tambah/Edit Produk Preset</h3>
@@ -598,7 +606,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        
+                        <tr>
+                            <td colspan="7" style="text-align: center;">Belum ada data filamen</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -676,463 +686,157 @@
     </div>
 
     <script>
-            function resetAllData() {
-        // Clear localStorage
-        localStorage.setItem('printJobs', JSON.stringify([]));
-        localStorage.setItem('products', JSON.stringify({}));
-        localStorage.setItem('filamentInventory', JSON.stringify({}));
-
-        // Reset all input fields
-        const inputs = document.querySelectorAll('input:not([type="button"]):not([type="submit"])');
-        inputs.forEach(input => {
-            if (input.type === 'number') {
-                if (input.id === 'electricity-rate') {
-                    input.value = '1444.70';
-                } else if (input.id === 'printer-power') {
-                    input.value = '200';
-                } else {
-                    input.value = '0';
-                }
-            } else {
-                input.value = '';
-            }
+// Load weekly records
+    function loadWeeklyRecords() {
+        const printJobs = JSON.parse(localStorage.getItem('printJobs'));
+        const tbody = document.querySelector('#weekly-records tbody');
+        tbody.innerHTML = '';
+        
+        // Get current date
+        const now = new Date();
+        
+        // Calculate the start of the current week (Sunday)
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+        
+        // Calculate the end of the current week (Saturday)
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        endOfWeek.setHours(23, 59, 59, 999);
+        
+        // Filter records for the current week
+        const weeklyJobs = printJobs.filter(job => {
+            const jobDate = new Date(job.date);
+            return jobDate >= startOfWeek && jobDate <= endOfWeek;
         });
-
-        // Reset all select elements
-        const selects = document.querySelectorAll('select');
-        selects.forEach(select => {
-            select.selectedIndex = 0;
-        });
-
-        // Reset all summary values
-        const values = document.querySelectorAll('.value');
-        values.forEach(value => {
-            if (value.id.includes('cost') || value.id.includes('revenue') || value.id.includes('profit')) {
-                value.textContent = 'Rp0';
-            } else if (value.id.includes('filament')) {
-                value.textContent = '0g';
-            } else if (value.id.includes('time')) {
-                value.textContent = '0 jam';
-            } else {
-                value.textContent = '0';
-            }
-        });
-
-        // Clear tables
-        const tables = ['daily-records', 'weekly-records', 'monthly-records', 'filament-inventory'];
-        tables.forEach(tableId => {
-            const tbody = document.querySelector(`#${tableId} tbody`);
-            if (tbody) {
-                tbody.innerHTML = '';
-            }
-        });
-
-        // Reset silica gel table to default state
-        document.querySelector('#silica-inventory tbody').innerHTML = `
-            <tr>
-                <td>Storage Box 1</td>
-                <td>${new Date().toLocaleDateString('id-ID')}</td>
-                <td>-</td>
-                <td>🔵 Aktif</td>
-                <td><button class="update-silica">Update</button></td>
-            </tr>
-        `;
-
-        // Reload page to apply all changes
-        location.reload();
-    }
-
-    // Add button to HTML
-    document.addEventListener('DOMContentLoaded', function() {
-        const resetButton = document.createElement('button');
-        resetButton.textContent = 'Reset Semua Data';
-        resetButton.style.backgroundColor = 'var(--warning)';
-        resetButton.style.marginTop = '2rem';
-        resetButton.onclick = resetAllData;
-        document.querySelector('.container').appendChild(resetButton);
-    });
-
-        // Set current date
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date();
-            const dateInput = document.getElementById('date');
-            dateInput.value = today.toISOString().split('T')[0];
-            
-            // Initialize data storage if not exists
-            if (!localStorage.getItem('printJobs')) {
-                localStorage.setItem('printJobs', JSON.stringify([]));
-            }
-            if (!localStorage.getItem('products')) {
-                const defaultProducts = {
-                };
-                localStorage.setItem('products', JSON.stringify(defaultProducts));
-            }
-            if (!localStorage.getItem('filamentInventory')) {
-                const defaultFilaments = {
-                };
-                localStorage.setItem('filamentInventory', JSON.stringify(defaultFilaments));
-            }
-            
-            loadDailyRecords();
-        });
-
-        // Tab Navigation
-        const tabLinks = document.querySelectorAll('.tab-link');
-        tabLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Deactivate all tabs
-                document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-                
-                // Activate selected tab
-                this.classList.add('active');
-                const tabId = this.getAttribute('data-tab');
-                document.getElementById(tabId).classList.add('active');
-                
-                // Load data for the tab
-                if (tabId === 'daily') {
-                    loadDailyRecords();
-                } else if (tabId === 'weekly') {
-                    loadWeeklyRecords();
-                } else if (tabId === 'monthly') {
-                    loadMonthlyRecords();
-                }
-            });
-        });
-
-        // Product selection and automatic calculation
-        const productSelect = document.getElementById('product-select');
-        productSelect.addEventListener('change', function() {
-            const productId = this.value;
-            if (!productId) return;
-            
-            const products = JSON.parse(localStorage.getItem('products'));
-            const product = products[productId];
-            
-            if (product) {
-                document.getElementById('filament-usage').value = product.filament;
-                document.getElementById('print-time').value = product.time;
-                document.getElementById('selling-price').value = product.price;
-                
-                calculateCosts();
-            }
-        });
-
-        // Input change triggers calculation
-        ['filament-usage', 'print-time', 'electricity-rate', 'printer-power'].forEach(id => {
-            document.getElementById(id).addEventListener('input', calculateCosts);
-        });
-
-        // Quick add from product cards
-        document.querySelectorAll('.quick-add').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                const productCard = this.closest('.product-card');
-                const productId = productCard.getAttribute('data-product');
-                
-                // Switch to daily tab
-                document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-                
-                document.querySelector('.tab-link[data-tab="daily"]').classList.add('active');
-                document.getElementById('daily').classList.add('active');
-                
-                // Set product
-                document.getElementById('product-select').value = productId;
-                
-                // Trigger change event
-                const event = new Event('change');
-                document.getElementById('product-select').dispatchEvent(event);
-                
-                // Scroll to form
-                document.getElementById('product-select').scrollIntoView({ behavior: 'smooth' });
-            });
-        });
-
-        // Save daily record
-        document.getElementById('save-daily').addEventListener('click', function() {
-            const date = document.getElementById('date').value;
-            const productId = document.getElementById('product-select').value;
-            const filamentType = document.getElementById('filament-type').value;
-            const filamentUsage = parseFloat(document.getElementById('filament-usage').value) || 0;
-            const printTime = parseFloat(document.getElementById('print-time').value) || 0;
-            const customerName = document.getElementById('customer-name').value;
-            const sellingPrice = parseFloat(document.getElementById('selling-price').value) || 0;
-            const notes = document.getElementById('notes').value;
-            
-            // Get product name
-            let productName = '';
-            if (productId) {
-                const products = JSON.parse(localStorage.getItem('products'));
-                productName = products[productId].name;
-            }
-            
-            // Calculate costs
-            const filamentCost = calculateFilamentCost(filamentType, filamentUsage);
-            const electricityCost = calculateElectricityCost(printTime);
-            const totalCost = filamentCost + electricityCost;
-            const profit = sellingPrice - totalCost;
-            
-            // Create record object
-            const record = {
-                date: date,
-                productId: productId,
-                productName: productName,
-                filamentType: filamentType,
-                filamentUsage: filamentUsage,
-                printTime: printTime,
-                filamentCost: filamentCost,
-                electricityCost: electricityCost,
-                totalCost: totalCost,
-                sellingPrice: sellingPrice,
-                profit: profit,
-                customerName: customerName,
-                notes: notes,
-                timestamp: new Date().getTime()
-            };
-            
-            // Save record
-            const printJobs = JSON.parse(localStorage.getItem('printJobs'));
-            printJobs.push(record);
-            localStorage.setItem('printJobs', JSON.stringify(printJobs));
-            
-            // Update filament inventory
-            updateFilamentInventory(filamentType, filamentUsage);
-            
-            // Reload records
-            loadDailyRecords();
-            
-            // Clear form
-            document.getElementById('product-select').value = '';
-            document.getElementById('filament-usage').value = '';
-            document.getElementById('print-time').value = '';
-            document.getElementById('customer-name').value = '';
-            document.getElementById('selling-price').value = '';
-            document.getElementById('notes').value = '';
-            document.getElementById('filament-cost').textContent = 'Rp0';
-            document.getElementById('electricity-cost').textContent = 'Rp0';
-            document.getElementById('total-cost').textContent = 'Rp0';
-            
-            alert('Data berhasil disimpan!');
-        });
-
-        // Add new product
-        document.getElementById('save-product').addEventListener('click', function() {
-            const name = document.getElementById('new-product-name').value;
-            const filament = parseFloat(document.getElementById('new-product-filament').value) || 0;
-            const time = parseFloat(document.getElementById('new-product-time').value) || 0;
-            const price = parseFloat(document.getElementById('new-product-price').value) || 0;
-            
-            if (!name) {
-                alert('Harap isi nama produk!');
-                return;
-            }
-            
-            // Create product ID from name
-            const productId = name.toLowerCase().replace(/\s+/g, '-');
-            
-            // Save product
-            const products = JSON.parse(localStorage.getItem('products'));
-            products[productId] = { name, filament, time, price };
-            localStorage.setItem('products', JSON.stringify(products));
-            
-            // Clear form
-            document.getElementById('new-product-name').value = '';
-            document.getElementById('new-product-filament').value = '';
-            document.getElementById('new-product-time').value = '';
-            document.getElementById('new-product-price').value = '';
-            
-            alert('Produk berhasil disimpan!');
-            
-            // Reload product grid
-            location.reload();
-        });
-
-        // Add new filament
-        document.getElementById('add-filament').addEventListener('click', function() {
-            const type = document.getElementById('add-filament-type').value;
-            const amount = parseFloat(document.getElementById('add-filament-amount').value) || 0;
-            const price = parseFloat(document.getElementById('add-filament-price').value) || 0;
-            
-            if (!type || amount <= 0 || price <= 0) {
-                alert('Harap isi semua data filamen dengan benar!');
-                return;
-            }
-            
-            // Create filament ID from type
-            const filamentId = type.toLowerCase().replace(/\s+/g, '-');
-            
-            // Save filament
-            const filaments = JSON.parse(localStorage.getItem('filamentInventory'));
-            filaments[filamentId] = { name: type, initial: amount, used: 0, price: price };
-            localStorage.setItem('filamentInventory', JSON.stringify(filaments));
-            
-            // Clear form
-            document.getElementById('add-filament-type').value = '';
-            document.getElementById('add-filament-amount').value = '';
-            document.getElementById('add-filament-price').value = '';
-            
-            alert('Filamen berhasil ditambahkan!');
-            
-            // Reload filament inventory
-            location.reload();
-        });
-
-        // Add new silica gel location
-        document.getElementById('add-silica').addEventListener('click', function() {
-            const location = document.getElementById('add-silica-location').value;
-            
-            if (!location) {
-                alert('Harap isi lokasi silica gel!');
-                return;
-            }
-            
-            // Add row to table
-            const today = new Date().toLocaleDateString('id-ID');
+        
+        if (weeklyJobs.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = '<td colspan="8" style="text-align: center;">Belum ada data untuk minggu ini</td>';
+            tbody.appendChild(row);
+            return;
+        }
+        
+        weeklyJobs.forEach(job => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${location}</td>
-                <td>${today}</td>
-                <td>-</td>
-                <td>🔵 Aktif</td>
-                <td><button class="update-silica">Update</button></td>
+                <td>${new Date(job.date).toLocaleDateString('id-ID')}</td>
+                <td>${job.productName}</td>
+                <td>${getFilamentName(job.filamentType)}</td>
+                <td>${job.filamentUsage}g</td>
+                <td>${job.printTime} jam</td>
+                <td>Rp${formatNumber(job.totalCost)}</td>
+                <td>Rp${formatNumber(job.sellingPrice)}</td>
+                <td>Rp${formatNumber(job.profit)}</td>
             `;
-            
-            document.querySelector('#silica-inventory tbody').appendChild(row);
-            
-            // Clear form
-            document.getElementById('add-silica-location').value = '';
-            
-            // Add event listener for new button
-            row.querySelector('.update-silica').addEventListener('click', updateSilicaStatus);
+            tbody.appendChild(row);
         });
+        
+        // Add weekly summary row
+        const totalCost = weeklyJobs.reduce((sum, job) => sum + job.totalCost, 0);
+        const totalRevenue = weeklyJobs.reduce((sum, job) => sum + job.sellingPrice, 0);
+        const totalProfit = weeklyJobs.reduce((sum, job) => sum + job.profit, 0);
+        const totalFilament = weeklyJobs.reduce((sum, job) => sum + job.filamentUsage, 0);
+        const totalTime = weeklyJobs.reduce((sum, job) => sum + job.printTime, 0);
+        
+        // Add summary row
+        const summaryRow = document.createElement('tr');
+        summaryRow.className = 'summary-row';
+        summaryRow.innerHTML = `
+            <td colspan="3"><strong>Total Minggu Ini</strong></td>
+            <td><strong>${totalFilament.toFixed(1)}g</strong></td>
+            <td><strong>${totalTime.toFixed(1)} jam</strong></td>
+            <td><strong>Rp${formatNumber(totalCost)}</strong></td>
+            <td><strong>Rp${formatNumber(totalRevenue)}</strong></td>
+            <td><strong>Rp${formatNumber(totalProfit)}</strong></td>
+        `;
+        tbody.appendChild(summaryRow);
+    }
 
-        // Update silica gel status
-        document.querySelectorAll('.update-silica').forEach(btn => {
-            btn.addEventListener('click', updateSilicaStatus);
+    // Load monthly records
+    function loadMonthlyRecords() {
+        const printJobs = JSON.parse(localStorage.getItem('printJobs'));
+        const tbody = document.querySelector('#monthly-records tbody');
+        tbody.innerHTML = '';
+        
+        // Get current date
+        const now = new Date();
+        
+        // Calculate the start of the current month
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        
+        // Calculate the end of the current month
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+        
+        // Filter records for the current month
+        const monthlyJobs = printJobs.filter(job => {
+            const jobDate = new Date(job.date);
+            return jobDate >= startOfMonth && jobDate <= endOfMonth;
         });
-
-        function updateSilicaStatus() {
-            const row = this.closest('tr');
-            const status = row.cells[3].textContent;
-            
-            if (status.includes('Aktif')) {
-                row.cells[3].textContent = '🔴 Perlu Recharge';
-            } else {
-                row.cells[2].textContent = new Date().toLocaleDateString('id-ID');
-                row.cells[3].textContent = '🔵 Aktif';
-            }
+        
+        if (monthlyJobs.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = '<td colspan="8" style="text-align: center;">Belum ada data untuk bulan ini</td>';
+            tbody.appendChild(row);
+            return;
         }
-
-        // Update filament inventory
-        document.querySelectorAll('.update-inventory').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const row = this.closest('tr');
-                const type = row.cells[0].textContent;
-                
-                const newAmount = prompt(`Tambah stok untuk ${type} (dalam gram):`, '0');
-                if (newAmount === null) return;
-                
-                const amount = parseFloat(newAmount) || 0;
-                if (amount <= 0) return;
-                
-                // Get filament ID
-                const filamentId = type.toLowerCase().replace(/\s+/g, '-');
-                
-                // Update inventory
-                const filaments = JSON.parse(localStorage.getItem('filamentInventory'));
-                if (filaments[filamentId]) {
-                    filaments[filamentId].initial += amount;
-                }
-                localStorage.setItem('filamentInventory', JSON.stringify(filaments));
-                
-                // Reload page
-                location.reload();
-            });
+        
+        // Group jobs by day
+        const jobsByDay = {};
+        monthlyJobs.forEach(job => {
+            const day = job.date;
+            if (!jobsByDay[day]) {
+                jobsByDay[day] = [];
+            }
+            jobsByDay[day].push(job);
         });
-
-        // Calculate costs based on inputs
-        function calculateCosts() {
-            const filamentType = document.getElementById('filament-type').value;
-            const filamentUsage = parseFloat(document.getElementById('filament-usage').value) || 0;
-            const printTime = parseFloat(document.getElementById('print-time').value) || 0;
+        
+        // Add rows for each day with jobs
+        Object.keys(jobsByDay).sort().forEach(day => {
+            const jobs = jobsByDay[day];
+            const dayDate = new Date(day);
             
-            const filamentCost = calculateFilamentCost(filamentType, filamentUsage);
-            const electricityCost = calculateElectricityCost(printTime);
-            const totalCost = filamentCost + electricityCost;
+            // Calculate daily totals
+            const dailyCost = jobs.reduce((sum, job) => sum + job.totalCost, 0);
+            const dailyRevenue = jobs.reduce((sum, job) => sum + job.sellingPrice, 0);
+            const dailyProfit = jobs.reduce((sum, job) => sum + job.profit, 0);
+            const dailyFilament = jobs.reduce((sum, job) => sum + job.filamentUsage, 0);
+            const dailyTime = jobs.reduce((sum, job) => sum + job.printTime, 0);
             
-            document.getElementById('filament-cost').textContent = 'Rp' + formatNumber(filamentCost);
-            document.getElementById('electricity-cost').textContent = 'Rp' + formatNumber(electricityCost);
-            document.getElementById('total-cost').textContent = 'Rp' + formatNumber(totalCost);
-        }
-
-        function calculateFilamentCost(filamentType, usage) {
-            const filaments = JSON.parse(localStorage.getItem('filamentInventory'));
-            if (filaments[filamentType]) {
-                // Calculate cost per gram from price per kg
-                const costPerGram = filaments[filamentType].price / 1000;
-                return costPerGram * usage;
-            }
-            return 0;
-        }
-
-        function calculateElectricityCost(hours) {
-            const powerConsumption = parseFloat(document.getElementById('printer-power').value) || 200; // Watts
-            const electricityRate = parseFloat(document.getElementById('electricity-rate').value) || 1444.70; // Rp per kWh
-            
-            // Convert watts to kilowatts and multiply by hours and rate
-            const kW = powerConsumption / 1000;
-            const kWh = kW * hours;
-            const cost = kWh * electricityRate;
-            
-            return cost;
-        }
-
-        function updateFilamentInventory(filamentType, usage) {
-            const filaments = JSON.parse(localStorage.getItem('filamentInventory'));
-            if (filaments[filamentType]) {
-                filaments[filamentType].used += usage;
-                localStorage.setItem('filamentInventory', JSON.stringify(filaments));
-            }
-        }
-
-        // Load daily records
-        function loadDailyRecords() {
-            const printJobs = JSON.parse(localStorage.getItem('printJobs'));
-            const tbody = document.querySelector('#daily-records tbody');
-            tbody.innerHTML = '';
-            
-            // Get today's date in YYYY-MM-DD format
-            const today = new Date().toISOString().split('T')[0];
-            
-            // Filter records for today
-            const todayJobs = printJobs.filter(job => job.date === today);
-            
-            if (todayJobs.length === 0) {
-                const row = document.createElement('tr');
-                row.innerHTML = '<td colspan="8" style="text-align: center;">Belum ada data untuk hari ini</td>';
-                tbody.appendChild(row);
-                return;
-            }
-            
-            todayJobs.forEach(job => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${job.productName}</td>
-                    <td>${getFilamentName(job.filamentType)}</td>
-                    <td>${job.filamentUsage}g</td>
-                    <td>${job.printTime} jam</td>
-                    <td>Rp${formatNumber(job.totalCost)}</td>
-                    <td>Rp${formatNumber(job.sellingPrice)}</td>
-                    <td>Rp${formatNumber(job.profit)}</td>
-                    <td>${job.customerName}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${dayDate.toLocaleDateString('id-ID')}</td>
+                <td>${jobs.length}</td>
+                <td>${dailyFilament.toFixed(1)}g</td>
+                <td>${dailyTime.toFixed(1)} jam</td>
+                <td>Rp${formatNumber(dailyCost)}</td>
+                <td>Rp${formatNumber(dailyRevenue)}</td>
+                <td>Rp${formatNumber(dailyProfit)}</td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+        // Add monthly summary row
+        const totalCost = monthlyJobs.reduce((sum, job) => sum + job.totalCost, 0);
+        const totalRevenue = monthlyJobs.reduce((sum, job) => sum + job.sellingPrice, 0);
+        const totalProfit = monthlyJobs.reduce((sum, job) => sum + job.profit, 0);
+        const totalFilament = monthlyJobs.reduce((sum, job) => sum + job.filamentUsage, 0);
+        const totalTime = monthlyJobs.reduce((sum, job) => sum + job.printTime, 0);
+        
+        // Add summary row
+        const summaryRow = document.createElement('tr');
+        summaryRow.className = 'summary-row';
+        summaryRow.innerHTML = `
+            <td colspan="2"><strong>Total Bulan Ini</strong></td>
+            <td><strong>${totalFilament.toFixed(1)}g</strong></td>
+            <td><strong>${totalTime.toFixed(1)} jam</strong></td>
+            <td><strong>Rp${formatNumber(totalCost)}</strong></td>
+            <td><strong>Rp${formatNumber(totalRevenue)}</strong></td>
+            <td><strong>Rp${formatNumber(totalProfit)}</strong></td>
+        `;
+        tbody.appendChild(summaryRow);
+    }   
 
         // Load weekly records
         function loadWeeklyRecords() {
