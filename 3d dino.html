@@ -695,7 +695,7 @@
             if (!localStorage.getItem('filamentInventory')) {
                 const defaultFilaments = {
                 };
-                
+
                 localStorage.setItem('filamentInventory', JSON.stringify(defaultFilaments));
             }
             
@@ -1058,42 +1058,193 @@
                 `;
                 tbody.appendChild(row);
             });
-        }
+        };
 
         // Load weekly records
         function loadWeeklyRecords() {
-            // Implementation will be added here
-            // For demo purposes, showing placeholder data
-            document.getElementById('weekly-products').textContent = '28';
-            document.getElementById('weekly-filament').textContent = '1,560g';
-            document.getElementById('weekly-time').textContent = '78 jam';
-            document.getElementById('weekly-revenue').textContent = 'Rp2,870,000';
-            document.getElementById('weekly-cost').textContent = '';
-            document.getElementById('weekly-profit').textContent = job.profit;
+            const printJobs = JSON.parse(localStorage.getItem('printJobs'));
+            const tbody = document.querySelector('#weekly-records tbody');
+            tbody.innerHTML = '';
+            
+            if (!printJobs || printJobs.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="8" style="text-align: center;">Belum ada data</td>';
+                tbody.appendChild(row);
+                
+                // Set all summary values to 0
+                document.getElementById('weekly-products').textContent = '0';
+                document.getElementById('weekly-filament').textContent = '0g';
+                document.getElementById('weekly-time').textContent = '0 jam';
+                document.getElementById('weekly-revenue').textContent = 'Rp0';
+                document.getElementById('weekly-cost').textContent = 'Rp0';
+                document.getElementById('weekly-profit').textContent = 'Rp0';
+                return;
+            }
+            
+            // Get current week's start and end dates
+            const now = new Date();
+            const currentWeekStart = getWeekStartDate(now);
+            const currentWeekEnd = getWeekEndDate(now);
+            
+            // Filter records for current week
+            const weekJobs = printJobs.filter(job => {
+                const jobDate = new Date(job.date);
+                return jobDate >= currentWeekStart && jobDate <= currentWeekEnd;
+            });
+            
+            // Calculate totals
+            let totalProducts = 0;
+            let totalFilament = 0;
+            let totalTime = 0;
+            let totalRevenue = 0;
+            let totalCost = 0;
+            let totalProfit = 0;
+            
+            weekJobs.forEach(job => {
+                totalProducts++;
+                totalFilament += job.filamentUsage;
+                totalTime += job.printTime;
+                totalRevenue += job.sellingPrice;
+                totalCost += job.totalCost;
+                totalProfit += job.profit;
+                
+                // Add to table
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(job.date).toLocaleDateString('id-ID', { weekday: 'long' })}</td>
+                    <td>${job.productName}</td>
+                    <td>${getFilamentName(job.filamentType)}</td>
+                    <td>${job.filamentUsage}g</td>
+                    <td>${job.printTime} jam</td>
+                    <td>Rp${formatNumber(job.totalCost)}</td>
+                    <td>Rp${formatNumber(job.sellingPrice)}</td>
+                    <td>Rp${formatNumber(job.profit)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Update summary
+            document.getElementById('weekly-products').textContent = totalProducts;
+            document.getElementById('weekly-filament').textContent = `${formatNumber(totalFilament)}g`;
+            document.getElementById('weekly-time').textContent = `${formatNumber(totalTime)} jam`;
+            document.getElementById('weekly-revenue').textContent = `Rp${formatNumber(totalRevenue)}`;
+            document.getElementById('weekly-cost').textContent = `Rp${formatNumber(totalCost)}`;
+            document.getElementById('weekly-profit').textContent = `Rp${formatNumber(totalProfit)}`;
+            
+            // If no data for current week, show message
+            if (weekJobs.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="8" style="text-align: center;">Belum ada data untuk minggu ini</td>';
+                tbody.appendChild(row);
+            }
         }
 
         // Load monthly records
         function loadMonthlyRecords() {
-            // Implementation will be added here
-            // For demo purposes, showing placeholder data
-            document.getElementById('monthly-products').textContent = '112';
-            document.getElementById('monthly-filament').textContent = '6,240g';
-            document.getElementById('monthly-time').textContent = '312 jam';
-            document.getElementById('monthly-revenue').textContent = 'Rp11,480,000';
-            document.getElementById('monthly-cost').textContent = 'Rp3,300,000';
-            document.getElementById('monthly-profit').textContent = 'Rp8,180,000';
+            const printJobs = JSON.parse(localStorage.getItem('printJobs'));
+            const tbody = document.querySelector('#monthly-records tbody');
+            tbody.innerHTML = '';
+            
+            if (!printJobs || printJobs.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="8" style="text-align: center;">Belum ada data</td>';
+                tbody.appendChild(row);
+                
+                // Set all summary values to 0
+                document.getElementById('monthly-products').textContent = '0';
+                document.getElementById('monthly-filament').textContent = '0g';
+                document.getElementById('monthly-time').textContent = '0 jam';
+                document.getElementById('monthly-revenue').textContent = 'Rp0';
+                document.getElementById('monthly-cost').textContent = 'Rp0';
+                document.getElementById('monthly-profit').textContent = 'Rp0';
+                return;
+            }
+            
+            // Get selected month
+            const monthSelect = document.getElementById('month-select');
+            const selectedMonth = parseInt(monthSelect.value) || new Date().getMonth() + 1;
+            const currentYear = new Date().getFullYear();
+            
+            // Filter records for selected month
+            const monthJobs = printJobs.filter(job => {
+                const jobDate = new Date(job.date);
+                return jobDate.getMonth() + 1 === selectedMonth && jobDate.getFullYear() === currentYear;
+            });
+            
+            // Calculate totals
+            let totalProducts = 0;
+            let totalFilament = 0;
+            let totalTime = 0;
+            let totalRevenue = 0;
+            let totalCost = 0;
+            let totalProfit = 0;
+            
+            monthJobs.forEach(job => {
+                totalProducts++;
+                totalFilament += job.filamentUsage;
+                totalTime += job.printTime;
+                totalRevenue += job.sellingPrice;
+                totalCost += job.totalCost;
+                totalProfit += job.profit;
+                
+                // Add to table
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(job.date).toLocaleDateString('id-ID')}</td>
+                    <td>${job.productName}</td>
+                    <td>${getFilamentName(job.filamentType)}</td>
+                    <td>${job.filamentUsage}g</td>
+                    <td>${job.printTime} jam</td>
+                    <td>Rp${formatNumber(job.totalCost)}</td>
+                    <td>Rp${formatNumber(job.sellingPrice)}</td>
+                    <td>Rp${formatNumber(job.profit)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Update summary
+            document.getElementById('monthly-products').textContent = totalProducts;
+            document.getElementById('monthly-filament').textContent = `${formatNumber(totalFilament)}g`;
+            document.getElementById('monthly-time').textContent = `${formatNumber(totalTime)} jam`;
+            document.getElementById('monthly-revenue').textContent = `Rp${formatNumber(totalRevenue)}`;
+            document.getElementById('monthly-cost').textContent = `Rp${formatNumber(totalCost)}`;
+            document.getElementById('monthly-profit').textContent = `Rp${formatNumber(totalProfit)}`;
+            
+            // If no data for selected month, show message
+            if (monthJobs.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="8" style="text-align: center;">Belum ada data untuk bulan ini</td>';
+                tbody.appendChild(row);
+            }
         }
 
-        // Helper function to get filament name from ID
-        function getFilamentName(filamentId) {
-            const filaments = JSON.parse(localStorage.getItem('filamentInventory'));
-            return filaments[filamentId] ? filaments[filamentId].name : filamentId;
+        // Helper function to get start of week (Monday)
+        function getWeekStartDate(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is Sunday
+            return new Date(d.setDate(diff));
         }
 
-        // Helper function to format numbers with thousand separators
-        function formatNumber(num) {
-            return Math.round(num).toLocaleString('id-ID');
+        // Helper function to get end of week (Sunday)
+        function getWeekEndDate(date) {
+            const start = getWeekStartDate(date);
+            const end = new Date(start);
+            end.setDate(start.getDate() + 6);
+            return end;
         }
+
+        // Update month select to current month by default
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentMonth = new Date().getMonth() + 1;
+            document.getElementById('month-select').value = currentMonth;
+            
+            // Add event listener for month select change
+            document.getElementById('month-select').addEventListener('change', loadMonthlyRecords);
+            
+            // Add event listener for week select change
+            document.getElementById('week-select').addEventListener('change', loadWeeklyRecords);
+        });
     </script>
 </body>
 </html>
